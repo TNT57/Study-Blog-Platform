@@ -24,4 +24,12 @@ describe("HomePage", () => {
       "https://github.com/TNT57/Study-Blog-Platform/tree/main/docs/learn",
     );
   });
+
+  it("draws the learning-notes link with a visible border", () => {
+    render(<HomePage />);
+
+    const link = screen.getByRole("link", { name: "Read the learning notes" });
+    expect(link).toHaveClass("border-border");
+    expect(link).not.toHaveClass("border-transparent");
+  });
 });

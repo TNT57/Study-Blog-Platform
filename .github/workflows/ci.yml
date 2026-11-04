@@ -1,5 +1,5 @@
 # CI = Continuous Integration.
-# On every push to main and every pull request, GitHub runs these checks
+# On every pull request and every push to main, GitHub runs these checks
 # on a fresh Linux machine. If one step fails, the PR shows a red cross.
 name: CI
 
@@ -8,15 +8,18 @@ on:
     branches: [main]
   pull_request:
 
-# If you push again while CI is still running, cancel the old run.
+# If you push to a PR again while CI is still running, cancel the old run.
+# Runs on main are never cancelled, so every commit on main gets a result.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # The workflow can only read the repo (principle of least privilege).
 permissions:
   contents: read
 
+# Every action is pinned to a full commit SHA, not a tag like "v7".
+# A tag can be moved to different code later; a SHA can't. Dependabot still updates them.
 jobs:
   check:
     name: Format, lint, typecheck, test, build
@@ -25,13 +28,16 @@ jobs:
 
     steps:
       - name: Check out the code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Don't keep the GitHub token on disk after checkout (we never push from CI).
+          persist-credentials: false
 
       - name: Install pnpm (version from package.json "packageManager")
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Install Node.js (version from .nvmrc)
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -42,7 +48,7 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
-      - name: Lint
+      - name: Lint (no warnings allowed)
         run: pnpm lint
 
       - name: Type check
@@ -52,7 +58,7 @@ jobs:
         run: pnpm test
 
       - name: Cache Next.js build
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**') }}
@@ -61,3 +67,37 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  commits:
+    name: Commit messages
+    # Only PRs have a list of new commits to check.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the code (full history, so we can see every PR commit)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Install Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The Git hook checks messages on your laptop, but "git commit --no-verify"
+      # skips it. This step checks them again where nobody can skip it.
+      - name: Check every commit message in this PR (Conventional Commits)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose

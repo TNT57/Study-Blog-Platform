@@ -1,0 +1,24 @@
+# Dependabot opens PRs to keep dependencies up to date (and safe).
+# Updates are grouped so you get one PR per week, not twenty.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Adelaide
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Adelaide
+    groups:
+      actions:
+        patterns: ["*"]

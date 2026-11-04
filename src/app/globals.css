@@ -1,0 +1,107 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens from the Claude Design style guide ("Calm Desk").
+ * Change a color here and every component that uses it changes too.
+ */
+:root {
+  /* Base colors */
+  --background: #f7f8fa; /* Paper: page background */
+  --foreground: #14161a; /* Ink: text and headings */
+  --card: #ffffff; /* Surface: cards and inputs */
+  --card-foreground: #14161a;
+  --popover: #ffffff;
+  --popover-foreground: #14161a;
+  --muted: #f1f3f6;
+  --muted-foreground: #5b6270; /* Muted: secondary text (6.1:1 on white) */
+  --secondary: #f1f3f6;
+  --secondary-foreground: #14161a;
+  --accent: #f1f3f6;
+  --accent-foreground: #14161a;
+  --border: #e3e6eb;
+  --input: #e3e6eb;
+
+  /* Brand + states */
+  --primary: #2f5bea; /* Focus blue (white text 5.5:1) */
+  --primary-foreground: #ffffff;
+  --ring: #2f5bea;
+  --focus-soft: #eaf0ff;
+  --break: #b45309; /* Break amber (white text 5.0:1) */
+  --break-soft: #fef3e2;
+  --destructive: #b42318; /* Danger red (white text 6.6:1) */
+  --danger-soft: #fdecea;
+  --success: #157f3c; /* Success green (white text 5.1:1) */
+  --success-soft: #e7f5ec;
+
+  /* Charts (Study page) */
+  --chart-1: #2f5bea;
+  --chart-2: #1f44c4;
+  --chart-3: #b45309;
+  --chart-4: #157f3c;
+  --chart-5: #5b6270;
+
+  /* Corner radius: buttons + inputs 8px, cards 12px, badges 6px */
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-heading: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+  --color-focus-soft: var(--focus-soft);
+  --color-break: var(--break);
+  --color-break-soft: var(--break-soft);
+  --color-destructive: var(--destructive);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: var(--radius);
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}

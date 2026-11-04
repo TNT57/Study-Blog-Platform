@@ -22,13 +22,14 @@
   --secondary-foreground: #14161a;
   --accent: #f1f3f6;
   --accent-foreground: #14161a;
-  --border: #e3e6eb;
-  --input: #e3e6eb;
+  --border: #e3e6eb; /* lines and dividers (decoration only) */
+  --input: #878e9b; /* input borders: 3.3:1 on white (WCAG needs 3:1) */
 
   /* Brand + states */
   --primary: #2f5bea; /* Focus blue (white text 5.5:1) */
   --primary-foreground: #ffffff;
-  --ring: #2f5bea;
+  --primary-hover: #1f44c4; /* Focus dark: hover + links (white text 7.8:1) */
+  --ring: #2f5bea; /* focus ring, drawn solid: 5.5:1 on white */
   --focus-soft: #eaf0ff;
   --break: #b45309; /* Break amber (white text 5.0:1) */
   --break-soft: #fef3e2;
@@ -44,7 +45,7 @@
   --chart-4: #157f3c;
   --chart-5: #5b6270;
 
-  /* Corner radius: buttons + inputs 8px, cards 12px, badges 6px */
+  /* Corner radius base (8px). Every radius token below is built from it. */
   --radius: 0.5rem;
 }
 
@@ -69,6 +70,7 @@
   --color-input: var(--input);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-ring: var(--ring);
   --color-focus-soft: var(--focus-soft);
   --color-break: var(--break);
@@ -83,16 +85,54 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
+  /* Radius: badges 6px, buttons + inputs 8px, cards 12px (see docs/design-tokens.md) */
+  --radius-sm: calc(var(--radius) * 0.75);
+  --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+
+  /* Type scale from the style guide (size / line height / weight) */
+  --text-display: 2.5rem; /* 40px */
+  --text-display--line-height: 3rem;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 600;
+  --text-h1: 2rem; /* 32px */
+  --text-h1--line-height: 2.5rem;
+  --text-h1--letter-spacing: -0.015em;
+  --text-h1--font-weight: 600;
+  --text-h2: 1.5rem; /* 24px */
+  --text-h2--line-height: 2rem;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.125rem; /* 18px */
+  --text-h3--line-height: 1.75rem;
+  --text-h3--font-weight: 600;
+  --text-body: 1rem; /* 16px, long reading text */
+  --text-body--line-height: 1.625rem;
+  --text-label: 0.9375rem; /* 15px, buttons and form labels */
+  --text-label--line-height: 1.25rem;
+  --text-small: 0.875rem; /* 14px, meta like author and date */
+  --text-small--line-height: 1.25rem;
+  --text-caption: 0.8125rem; /* 13px, badges */
+  --text-caption--line-height: 1rem;
+  --text-timer: 6rem; /* 96px, Geist Mono */
+  --text-timer--line-height: 1;
+  --text-timer-phone: 4.5rem; /* 72px on phones */
+  --text-timer-phone--line-height: 1;
+
+  /* Page widths: max-w-content (1120px) and max-w-reading (720px) */
+  --container-content: 70rem;
+  --container-reading: 45rem;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
+  }
+  /* Keyboard focus: a solid 2px ring with a 2px gap, so it is visible on any color. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
   body {
     @apply bg-background text-foreground;

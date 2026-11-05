@@ -1,0 +1,24 @@
+# Local PostgreSQL for development and tests.
+# Start it with `pnpm db:up`, stop it with `pnpm db:down`.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: study
+      POSTGRES_PASSWORD: study # only for your laptop; real passwords never go in Git
+      POSTGRES_DB: study_blog
+    ports:
+      - "5432:5432"
+    volumes:
+      # Keeps your data when the container stops.
+      - db-data:/var/lib/postgresql/data
+      # Runs once, on the very first start: creates the test database.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U study -d study_blog"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  db-data:

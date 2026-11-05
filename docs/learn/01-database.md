@@ -47,9 +47,87 @@ flowchart LR
 
 The model is the **start and the end** of the trip: it writes the SQL, and it turns the rows into TypeScript objects.
 
-## Run it yourself
+## Docker in 2 minutes
 
-You need **Docker Desktop** (free, from docker.com). On Windows, it uses WSL 2; the installer sets it up.
+Docker runs PostgreSQL in a sealed box on your laptop, so you don't install it into Windows or macOS.
+Everyone (you, me, CI) gets exactly the same PostgreSQL 17.
+
+Metaphor: a video game.
+
+| Word               | Simple meaning                                                                  | Game metaphor            |
+| ------------------ | ------------------------------------------------------------------------------- | ------------------------ |
+| **Image**          | A ready-made package with a program inside (ours: `postgres:17-alpine`)         | The game installer       |
+| **Container**      | A running copy of an image (ours is called `db`)                                | The game, running        |
+| **Volume**         | Storage that stays when the container is stopped or deleted (ours: `db-data`)   | The save file            |
+| **Docker Compose** | `docker-compose.yml`: one file that says which containers to start, and how     | The game's settings file |
+| **Port**           | `5432:5432` connects port 5432 on your laptop to port 5432 inside the container | The door into the box    |
+
+You can delete and re-create the container at any time. Your data lives in the volume, like a save file.
+
+`pnpm db:up` runs `docker compose up -d --wait`. It reads `docker-compose.yml`, downloads the image the first time (about 100 MB),
+starts the container in the background (`-d`), and waits until PostgreSQL says it's ready (`--wait`).
+On the very first start only, it also runs `db/init/01-create-test-db.sql`, which creates the `study_blog_test` database.
+
+**In Docker Desktop**, after `pnpm db:up`:
+
+- **Containers**: a group called `study-blog-platform` with `db-1` inside, a green dot, and the port `5432:5432`.
+  The ■ / ▶ buttons stop and start it. Click it to see its **Logs** (PostgreSQL's messages).
+- **Images**: `postgres` with the tag `17-alpine`.
+- **Volumes**: `study-blog-platform_db-data`. This is your data.
+- You can ignore the rest for now (Gordon, Kubernetes, Models, MCP Toolkit, Builds, Extensions). You don't need to sign in.
+
+Docker Desktop must be open ("Engine running" at the bottom left) before any `docker` or `pnpm db:*` command works.
+
+| I want to…                                 | Command                                     |
+| ------------------------------------------ | ------------------------------------------- |
+| Start the database                         | `pnpm db:up`                                |
+| Stop it (your data is kept)                | `pnpm db:down`                              |
+| Check if it's running                      | `docker compose ps`                         |
+| Read its messages                          | `docker compose logs db`                    |
+| Type SQL inside it                         | `pnpm db:psql`                              |
+| Delete **all** local data, start from zero | `docker compose down -v`, then `pnpm db:up` |
+
+If something goes wrong:
+
+- **"Cannot connect to the Docker daemon"** or **"error during connect"**: Docker Desktop isn't open. Open it and wait for "Engine running".
+- **"port is already allocated"** or **"password authentication failed for user "study""**: another PostgreSQL already uses port 5432
+  (for example, one you installed for a uni course). On Windows: Win + R → `services.msc` → find `postgresql-x64-…` → Stop,
+  and set "Startup type" to Manual. Then run `pnpm db:up` again.
+- **"database "study_blog_test" does not exist"**: the init script only runs when the volume is new.
+  Run `docker compose down -v`, then `pnpm db:up`.
+
+## Start here (on your laptop)
+
+### 1. Get the M1 branch
+
+After you merged PR #1, I rebuilt this branch on top of the new `main`. Your laptop still has the old M0 copy,
+so a plain `git pull` would fail with "divergent branches". These commands make your branch the same as GitHub's.
+
+First check that you have no unsaved changes. It must say "nothing to commit, working tree clean":
+
+```bash
+git status
+```
+
+```bash
+git fetch origin
+```
+
+```bash
+git checkout -B tnt57/focused-hopper-v5osaw origin/tnt57/focused-hopper-v5osaw
+```
+
+`-B` means "create this branch, or reset it if it already exists". Use the same `git fetch` + `git checkout -B` at the start of every milestone.
+
+Then install the new packages (`pg`, `zod`, `tsx`):
+
+```bash
+pnpm install
+```
+
+### 2. Start the database and look inside
+
+Copy the example settings. They already have the right values for the Docker database:
 
 ```bash
 cp .env.example .env.local
@@ -59,9 +137,14 @@ cp .env.example .env.local
 pnpm db:up
 ```
 
+It ends with `Container study-blog-platform-db-1 Healthy`. Now create the tables:
+
 ```bash
 pnpm db:migrate
 ```
+
+You should see `✓ 0001_create_users.sql` and `Done: 1 migration(s).` Run it again: now it says "Nothing to do".
+That's the migration log (`schema_migrations`) at work. Now look inside:
 
 ```bash
 pnpm db:psql
@@ -75,29 +158,14 @@ Type `\q` to leave. After Task 1 you can also run `pnpm db:seed` and `SELECT * F
 The tests for both tasks are already written and **red**. Your job is to make them green.
 This way of working is called **TDD** (test-driven development): red → write code → green.
 
-Get the branch first:
-
-```bash
-git fetch origin
-```
-
-```bash
-git checkout tnt57/focused-hopper-v5osaw
-```
-
-```bash
-git pull
-```
-
-```bash
-pnpm install
-```
-
-Then run the database tests. You will see the red ones:
+The database must be running (`pnpm db:up`, also after every laptop restart). Run the database tests:
 
 ```bash
 pnpm test:db
 ```
+
+You should see **14 failed** and the rest passed. The failures say `relation "posts" does not exist` (Task 1)
+and `TODO(you)` (Task 2).
 
 The test database is rebuilt from zero on **every** test run, so you can change your SQL and run the tests again as often as you like.
 

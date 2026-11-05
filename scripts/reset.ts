@@ -2,7 +2,7 @@
 // Use it after you change a migration that isn't merged yet.
 import "./load-env";
 
-import { execFileSync } from "node:child_process";
+import { execSync } from "node:child_process";
 
 import { Client } from "pg";
 
@@ -27,8 +27,10 @@ async function main() {
     await client.end();
   }
 
-  execFileSync("pnpm", ["db:migrate"], { stdio: "inherit" });
-  execFileSync("pnpm", ["db:seed"], { stdio: "inherit" });
+  // execSync runs the command through a shell. On Windows, pnpm is "pnpm.cmd",
+  // and only a shell can find and run .cmd files. (The command is fixed text, no user input.)
+  execSync("pnpm db:migrate", { stdio: "inherit" });
+  execSync("pnpm db:seed", { stdio: "inherit" });
 }
 
 main().catch((error: unknown) => {

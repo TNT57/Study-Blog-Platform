@@ -1,0 +1,15 @@
+# pnpm settings for this project.
+
+# Some packages want to run a script when they are installed.
+# pnpm 11 only runs these scripts if we allow them here. We don't need these two.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+
+# eslint-config-next 16.4 supports ESLint 10 (see the Next.js ESLint docs),
+# but these plugins don't list ESLint 10 in their peer dependencies yet.
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-import>eslint: "10"
+    eslint-plugin-jsx-a11y>eslint: "10"
+    eslint-plugin-react>eslint: "10"

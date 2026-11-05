@@ -1,0 +1,42 @@
+# Dependabot opens PRs to keep dependencies up to date.
+# Updates are grouped so you get about one PR per week, not twenty.
+# (Security-fix PRs are a separate repo setting: Settings → Advanced Security →
+# Dependabot security updates. The cooldown below never delays them.)
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Adelaide
+    open-pull-requests-limit: 5
+    # Wait a few days after a new release before suggesting it.
+    # Most bad or hacked releases are found and removed in the first days.
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
+    # Commit messages like "chore(deps): bump next from 16.4.4 to 16.4.5",
+    # so they pass commitlint.
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Adelaide
+    cooldown:
+      default-days: 3
+    # Commit messages like "ci(deps): bump actions/checkout ..."
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      actions:
+        patterns: ["*"]

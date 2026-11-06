@@ -203,8 +203,10 @@ Hint: `findUserById()` in `src/models/user.model.ts` has the same shape.
 
 Done when: the 3 tests in `findPostById (Task 2)` are green, and `pnpm check` is all green.
 
-**Bonus (2 minutes):** change your query to the _wrong_ way on purpose, gluing the id into the text:
-`` `... WHERE id = ${id}` ``. Run `pnpm test:db`. Which test turns red, and why? Then change it back.
+**Bonus (2 minutes):** change your query to the _wrong_ way on purpose: glue the id into the text,
+`` `... WHERE id = ${id}` ``, and change the params from `[id]` to `[]`. Run `pnpm test:db`.
+Which test turns red, and why? Then change it back.
+(If you keep `[id]`, all 3 tests fail with "bind message supplies 1 parameters": Postgres got a value but found no `$1` to put it in.)
 
 ### When both tasks are green
 

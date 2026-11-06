@@ -9,7 +9,7 @@ import {
   updatePost,
 } from "@/models/post.model";
 
-import { makeUser } from "./helpers";
+import { expectDbError, makeUser } from "./helpers";
 
 async function makePost(authorId: number, title = "A post") {
   return createPost({ authorId, title, content: "Some content." });
@@ -104,11 +104,13 @@ describe("post model", () => {
       await makePost(author.id, "Secret draft");
 
       // If the id were glued into the SQL text, this would become
-      // "WHERE id = 0 OR 1=1" and return a post. With $1 it's just a bad number.
+      // "WHERE id = 0 OR 1=1" and return a post. With $1, Postgres gets the whole
+      // text as one value and refuses it, because it isn't an integer (error 22P02).
+      // (Checking the exact code matters: "any error" would also pass before
+      // findPostById() is written, because the TODO line throws an error too.)
       const attack = "0 OR 1=1" as unknown as number;
-      const result = await findPostById(attack).catch(() => null);
 
-      expect(result).toBeNull();
+      expect(await expectDbError(() => findPostById(attack))).toBe("22P02");
     });
   });
 });

@@ -24,6 +24,7 @@ The tables below are the "translation dictionary".
 | Danger      | `#B42318`           | `--destructive`                                   | `bg-destructive`             | Delete, errors                   |
 | Success     | `#157F3C`           | `--success`                                       | `text-success`               | "Saved" messages                 |
 | Soft colors | `#FEF3E2` and so on | `--break-soft`, `--danger-soft`, `--success-soft` | `bg-break-soft` and so on    | Badge backgrounds                |
+| Skeleton    | `#E9ECF0`           | `--skeleton`                                      | `bg-skeleton`                | Loading placeholders             |
 
 Why two grays for lines? WCAG says the border of an **input** must have 3:1 contrast, so people can see where to type.
 `#E3E6EB` is only 1.25:1, so it is for decoration (dividers, card edges) only.
@@ -36,6 +37,7 @@ Why two grays for lines? WCAG says the border of an **input** must have 3:1 cont
 | Heading 1   | 32 / 40, 600       | `text-h1`                        |
 | Heading 2   | 24 / 32, 600       | `text-h2`                        |
 | Heading 3   | 18 / 28, 600       | `text-h3`                        |
+| Reading     | 17 / 30            | `text-reading`                   |
 | Body        | 16 / 26            | `text-body`                      |
 | Label       | 15 / 20            | `text-label`                     |
 | Small       | 14 / 20            | `text-small`                     |

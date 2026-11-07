@@ -84,7 +84,7 @@ describe("post model", () => {
     expect(await deletePost(post.id)).toBe(false);
   });
 
-  // TODO(you): Task 2 — these 3 tests are red until you write findPostById().
+  // Task 2 of the M1 pair tasks: see docs/learn/01-database.md.
   describe("findPostById (Task 2)", () => {
     it("finds a post by its id", async () => {
       const author = await makeUser();

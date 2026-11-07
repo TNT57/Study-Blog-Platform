@@ -46,18 +46,12 @@ export async function createPost(input: NewPost): Promise<Post> {
   return toPost(rows[0]);
 }
 
-/**
- * Finds one post by its id. Returns null if there is no such post.
- *
- * TODO(you): Task 2 in docs/learn/01-database.md.
- * Write a SELECT with a $1 parameter, like findUserById() in user.model.ts,
- * and use toPost() above to turn the row into a Post.
- */
+/** Finds one post by its id. Returns null if there is no such post. */
 export async function findPostById(id: number): Promise<Post | null> {
   const rows = await query<PostRow>(
     `SELECT id, author_id, title, content, created_at, updated_at
-    FROM posts
-    WHERE id = $1`,
+     FROM posts
+     WHERE id = $1`,
     [id],
   );
   return rows[0] ? toPost(rows[0]) : null;

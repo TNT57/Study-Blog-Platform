@@ -116,7 +116,7 @@ The `controllers/` folder arrives in Milestone 2 (MVC).
 
 - [x] **D** Design every screen in Claude Design
 - [x] **M0** Project setup + CI
-- [ ] **M1** Database + models (PostgreSQL, raw SQL, migrations, Docker)
+- [x] **M1** Database + models (PostgreSQL, raw SQL, migrations, Docker)
 - [ ] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
 - [ ] **M2** Posts CRUD with MVC
 - [ ] **M3** Authentication (register, login, logout, sessions)

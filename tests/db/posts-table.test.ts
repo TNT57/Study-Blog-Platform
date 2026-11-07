@@ -1,6 +1,5 @@
-// Checks the rules of the posts table.
-// TODO(you): Task 1 — these tests are red until you write db/migrations/0002_create_posts.sql
-// (see docs/learn/01-database.md).
+// Checks the rules of the posts table (db/migrations/0002_create_posts.sql).
+// Task 1 of the M1 pair tasks: see docs/learn/01-database.md.
 import { describe, expect, it } from "vitest";
 
 import { query } from "@/lib/db";

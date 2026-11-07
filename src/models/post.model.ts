@@ -54,7 +54,13 @@ export async function createPost(input: NewPost): Promise<Post> {
  * and use toPost() above to turn the row into a Post.
  */
 export async function findPostById(id: number): Promise<Post | null> {
-  throw new Error(`TODO(you): findPostById(${id}) is not written yet (Task 2)`);
+  const rows = await query<PostRow>(
+    `SELECT id, author_id, title, content, created_at, updated_at
+    FROM posts
+    WHERE id = $1`,
+    [id],
+  );
+  return rows[0] ? toPost(rows[0]) : null;
 }
 
 /**

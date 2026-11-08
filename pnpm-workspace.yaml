@@ -3,6 +3,7 @@
 # Some packages want to run a script when they are installed.
 # pnpm 11 only runs these scripts if we allow them here. We don't need these two.
 allowBuilds:
+  esbuild: false # used by tsx; its binary comes as a normal package, the script isn't needed
   sharp: false
   unrs-resolver: false
 

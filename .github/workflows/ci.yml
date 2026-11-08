@@ -26,6 +26,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    # A real PostgreSQL 17 just for this run (a "service container").
+    # It starts empty every time, so tests always begin from zero.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: study
+          POSTGRES_PASSWORD: study # a throwaway database, not a real secret
+          POSTGRES_DB: study_blog_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U study -d study_blog_test"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
+
+    env:
+      TEST_DATABASE_URL: postgres://study:study@localhost:5432/study_blog_test
+
     steps:
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -54,7 +74,7 @@ jobs:
       - name: Type check
         run: pnpm typecheck
 
-      - name: Unit tests
+      - name: Tests (unit + database)
         run: pnpm test
 
       - name: Cache Next.js build

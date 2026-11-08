@@ -50,18 +50,10 @@ Copy the example settings (it has the right values for the Docker database):
 cp .env.example .env.local
 ```
 
-Start PostgreSQL, create the tables, and add demo data:
+Start PostgreSQL, create the tables, and add demo data (one command runs `db:up`, `db:migrate` and `db:seed`):
 
 ```bash
-pnpm db:up
-```
-
-```bash
-pnpm db:migrate
-```
-
-```bash
-pnpm db:seed
+pnpm db:setup
 ```
 
 ```bash
@@ -91,6 +83,7 @@ Then open <http://localhost:3000>.
 | `pnpm db:migrate`   | Run new migrations from `db/migrations/`                |
 | `pnpm db:seed`      | Add a demo user and demo posts                          |
 | `pnpm db:reset`     | Wipe the local database, then migrate and seed again    |
+| `pnpm db:setup`     | Start PostgreSQL, create the tables, add the demo data  |
 | `pnpm db:psql`      | Open a SQL prompt on the local database                 |
 
 ## Project structure

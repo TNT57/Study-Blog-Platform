@@ -96,19 +96,11 @@ git checkout -B tnt57/focused-hopper-v5osaw origin/tnt57/focused-hopper-v5osaw
 pnpm install
 ```
 
-Start the database, create the tables and add the demo user and posts (the demo user is needed
-to write posts until M3):
+Start the database, create the tables and add the demo user and posts, all in one command
+(it runs `db:up`, `db:migrate` and `db:seed`; the demo user is needed to write posts until M3):
 
 ```bash
-pnpm db:up
-```
-
-```bash
-pnpm db:migrate
-```
-
-```bash
-pnpm db:seed
+pnpm db:setup
 ```
 
 ```bash

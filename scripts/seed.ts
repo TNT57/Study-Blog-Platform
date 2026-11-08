@@ -3,6 +3,7 @@
 import "./load-env";
 
 import { closePool } from "@/lib/db";
+import { DEMO_EMAIL } from "@/lib/demo";
 import { createPost } from "@/models/post.model";
 import { createUser, findUserByEmail } from "@/models/user.model";
 
@@ -30,7 +31,7 @@ const DEMO_POSTS = [
 ];
 
 async function main() {
-  const email = "demo@example.com";
+  const email = DEMO_EMAIL;
   if (await findUserByEmail(email)) {
     console.log("Seed skipped: the demo user already exists.");
     return;

@@ -8,6 +8,7 @@ const TEXT_SIZES = [
   "h1",
   "h2",
   "h3",
+  "reading",
   "body",
   "label",
   "small",

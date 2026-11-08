@@ -88,6 +88,70 @@ jobs:
       - name: Build
         run: pnpm build
 
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Its own empty PostgreSQL, like the check job.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: study
+          POSTGRES_PASSWORD: study # a throwaway database, not a real secret
+          POSTGRES_DB: study_blog_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U study -d study_blog_e2e"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
+
+    env:
+      DATABASE_URL: postgres://study:study@localhost:5432/study_blog_e2e
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Install Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the Chromium browser for Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Create the tables and the demo user
+        run: pnpm db:migrate && pnpm db:seed
+
+      - name: Build
+        run: pnpm build
+
+      # playwright.config.ts starts `pnpm start` itself, then a real browser clicks through the app.
+      - name: End-to-end tests
+        run: pnpm test:e2e
+
+      # When a test fails, keep the report (with screenshots and a step-by-step trace) for 7 days.
+      - name: Save the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   commits:
     name: Commit messages
     # Only PRs have a list of new commits to check.

@@ -50,18 +50,10 @@ Copy the example settings (it has the right values for the Docker database):
 cp .env.example .env.local
 ```
 
-Start PostgreSQL, create the tables, and add demo data:
+Start PostgreSQL, create the tables, and add demo data (one command runs `db:up`, `db:migrate` and `db:seed`):
 
 ```bash
-pnpm db:up
-```
-
-```bash
-pnpm db:migrate
-```
-
-```bash
-pnpm db:seed
+pnpm db:setup
 ```
 
 ```bash
@@ -84,12 +76,14 @@ Then open <http://localhost:3000>.
 | `pnpm test`         | Run all tests once (needs the database running)         |
 | `pnpm test:unit`    | Run only the fast unit tests (no database needed)       |
 | `pnpm test:db`      | Run only the database tests                             |
+| `pnpm test:e2e`     | Click through the app in a real browser (Playwright)    |
 | `pnpm test:watch`   | Run the tests again every time you save a file          |
 | `pnpm check`        | Run format check, lint, typecheck and tests in one step |
 | `pnpm db:up`        | Start PostgreSQL in Docker (`db:down` stops it)         |
 | `pnpm db:migrate`   | Run new migrations from `db/migrations/`                |
 | `pnpm db:seed`      | Add a demo user and demo posts                          |
 | `pnpm db:reset`     | Wipe the local database, then migrate and seed again    |
+| `pnpm db:setup`     | Start PostgreSQL, create the tables, add the demo data  |
 | `pnpm db:psql`      | Open a SQL prompt on the local database                 |
 
 ## Project structure
@@ -97,20 +91,24 @@ Then open <http://localhost:3000>.
 ```
 src/
 ├─ app/              Pages and routes (View)
-├─ components/ui/    Reusable UI pieces from shadcn/ui (View)
+├─ components/       PostCard, PostForm, skeletons, and ui/ from shadcn/ui (View)
+├─ controllers/      Reads (*.queries.ts) and Server Actions (*.actions.ts) (Controller)
 ├─ models/           The only files with SQL (Model)
-└─ lib/              Shared helpers: env.ts, db.ts (pool), migrations.ts
+└─ lib/              Shared helpers: validation/, format.ts, env.ts, db.ts (pool), migrations.ts
 db/migrations/       Numbered SQL files that build the database
 scripts/             db:migrate, db:seed, db:reset
 tests/unit/          Fast tests (no database)
-tests/db/            Model tests on a real PostgreSQL
+tests/db/            Model and controller tests on a real PostgreSQL
+e2e/                 Browser tests (Playwright)
 docs/learn/          One learning note per milestone
+docs/architecture.md   The MVC layers and their rules
 docs/design-tokens.md  Design name → CSS variable → Tailwind class
 .github/             CI workflow + Dependabot
 docker-compose.yml   The local PostgreSQL 17
 ```
 
-The `controllers/` folder arrives in Milestone 2 (MVC).
+An ESLint rule keeps the MVC borders: a page can't import a model, and a model can't import Next.js.
+See [`docs/architecture.md`](docs/architecture.md).
 
 ## Roadmap
 
@@ -118,7 +116,7 @@ The `controllers/` folder arrives in Milestone 2 (MVC).
 - [x] **M0** Project setup + CI
 - [x] **M1** Database + models (PostgreSQL, raw SQL, migrations, Docker)
 - [ ] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
-- [ ] **M2** Posts CRUD with MVC
+- [x] **M2** Posts CRUD with MVC
 - [ ] **M3** Authentication (register, login, logout, sessions)
 - [ ] **M4** Authorization (only the owner or an admin can edit)
 - [ ] **M5** Pomodoro timer + study stats

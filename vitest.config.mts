@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
 
 import react from "@vitejs/plugin-react";
@@ -20,6 +21,12 @@ export default defineConfig({
   resolve: {
     // Lets tests use the same "@/..." imports as the app (from tsconfig.json).
     tsconfigPaths: true,
+    alias: {
+      // "server-only" throws outside a Next.js server build. In tests it is an empty module.
+      "server-only": fileURLToPath(
+        new URL("./tests/empty-module.ts", import.meta.url),
+      ),
+    },
   },
   test: {
     projects: [

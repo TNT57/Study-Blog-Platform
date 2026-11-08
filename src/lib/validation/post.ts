@@ -16,8 +16,16 @@ export const CONTENT_MAX = 20_000;
  * trim, the minimum and maximum lengths, and the error messages from the table in the note.
  */
 export const postSchema = z.object({
-  title: z.string(),
-  content: z.string(),
+  title: z
+    .string()
+    .trim()
+    .min(1, "Title is required.")
+    .max(TITLE_MAX, "Title must be 120 characters or fewer."),
+  content: z
+    .string()
+    .trim()
+    .min(CONTENT_MIN, "Content must be at least 10 characters.")
+    .max(CONTENT_MAX, "Content must be 20 000 characters or fewer."),
 });
 
 /** A post after the rules ran: trimmed, and the right lengths. */
@@ -60,9 +68,13 @@ export function parsePostForm(formData: FormData): ParsedPostForm {
   if (!parsed.success) {
     // TODO(you): Task 2 in docs/learn/02-posts-crud.md.
     // Return { success: false, state: ... } with the typed values and the errors per field.
-    throw new Error(
-      "TODO(you): the 'validation failed' branch of parsePostForm() is not written yet (Task 2)",
-    );
+    return {
+      success: false,
+      state: {
+        values: values,
+        errors: z.flattenError(parsed.error).fieldErrors,
+      },
+    };
   }
 
   return { success: true, data: parsed.data };

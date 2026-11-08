@@ -1,5 +1,5 @@
-// Task 1: the rules for a post (src/lib/validation/post.ts).
-// These tests are red until you write the real postSchema (see docs/learn/02-posts-crud.md).
+// The rules for a post (src/lib/validation/post.ts).
+// Task 1 of the M2 pair tasks (see docs/learn/02-posts-crud.md).
 import { describe, expect, it } from "vitest";
 
 import { postSchema } from "@/lib/validation/post";

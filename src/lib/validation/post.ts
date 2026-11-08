@@ -10,10 +10,7 @@ export const CONTENT_MAX = 20_000;
 
 /**
  * The rules for a post's title and content.
- *
- * TODO(you): Task 1 in docs/learn/02-posts-crud.md.
- * Right now any text passes, even an empty title. Add the real rules:
- * trim, the minimum and maximum lengths, and the error messages from the table in the note.
+ * .trim() runs first, so a title of only spaces becomes "" and fails .min(1).
  */
 export const postSchema = z.object({
   title: z
@@ -66,8 +63,7 @@ export function parsePostForm(formData: FormData): ParsedPostForm {
 
   const parsed = postSchema.safeParse(values);
   if (!parsed.success) {
-    // TODO(you): Task 2 in docs/learn/02-posts-crud.md.
-    // Return { success: false, state: ... } with the typed values and the errors per field.
+    // Give the form back what the user typed (unchanged) and one list of messages per field.
     return {
       success: false,
       state: {

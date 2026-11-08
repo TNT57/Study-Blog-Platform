@@ -1,5 +1,5 @@
-// Task 2: the "validation failed" branch of parsePostForm() (src/lib/validation/post.ts).
-// These tests need Task 1 first: with no rules, nothing ever fails.
+// parsePostForm() (src/lib/validation/post.ts). The "validation failed" branch was
+// Task 2 of the M2 pair tasks (see docs/learn/02-posts-crud.md).
 import { describe, expect, it } from "vitest";
 
 import { parsePostForm } from "@/lib/validation/post";

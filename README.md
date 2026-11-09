@@ -17,7 +17,7 @@ Each milestone is one pull request with a short learning note in [`docs/learn/`]
 | UI              | Tailwind CSS v4 + shadcn/ui (Base UI)                         |
 | Design          | Claude Design canvas (style guide + every screen)             |
 | Database        | PostgreSQL 17 (from M1): raw SQL with `pg`, Drizzle ORM in M8 |
-| Auth            | Built by hand: Argon2id + database sessions (from M3)         |
+| Auth            | Built by hand: Argon2id + database sessions                   |
 | Tests           | Vitest + Testing Library, Playwright (from M2)                |
 | Code quality    | ESLint, Prettier, Husky + lint-staged, Conventional Commits   |
 | CI / CD         | GitHub Actions, Dependabot, Vercel + Neon (from M1)           |
@@ -124,7 +124,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **M1** Database + models (PostgreSQL, raw SQL, migrations, Docker)
 - [x] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
 - [x] **M2** Posts CRUD with MVC
-- [ ] **M3** Authentication (register, login, logout, sessions)
+- [x] **M3** Authentication (register, login, logout, sessions)
 - [ ] **M4** Authorization (only the owner or an admin can edit)
 - [ ] **M5** Pomodoro timer + study stats
 - [ ] **M6** End-to-end tests + accessibility checks

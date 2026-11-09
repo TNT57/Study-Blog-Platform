@@ -8,6 +8,11 @@ vi.mock("next/cache", () => ({
   cacheLife: vi.fn(),
   cacheTag: vi.fn(),
 }));
+// cookies() becomes a pretend cookie jar, so tests can be "logged in".
+vi.mock("next/headers", async () => {
+  const { cookieJar } = await import("./cookie-jar");
+  return { cookies: () => cookieJar.cookies() };
+});
 vi.mock("next/navigation", () => ({
   redirect: vi.fn((url: string) => {
     throw new Error(`REDIRECT ${url}`);
@@ -20,11 +25,12 @@ vi.mock("next/navigation", () => ({
 import { updateTag } from "next/cache";
 
 import { createPost, deletePost, updatePost } from "@/controllers/post.actions";
+import { startSession } from "@/controllers/session";
 import { query } from "@/lib/db";
-import { DEMO_EMAIL } from "@/lib/demo";
 import type { PostFormState } from "@/lib/validation/post";
 import * as posts from "@/models/post.model";
 
+import { cookieJar } from "./cookie-jar";
 import { makeUser } from "./helpers";
 
 const empty: PostFormState = { values: { title: "", content: "" } };
@@ -43,13 +49,21 @@ async function countPosts() {
   return row.count;
 }
 
+/** Makes a user and logs them in (puts a real session token in the cookie jar). */
+async function logIn(overrides: Parameters<typeof makeUser>[0] = {}) {
+  const user = await makeUser(overrides);
+  await startSession(user.id);
+  return user;
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
+  cookieJar.clear();
 });
 
 describe("createPost", () => {
-  it("saves the post for the demo user, clears the list cache and opens the post", async () => {
-    const demo = await makeUser({ username: "demo", email: DEMO_EMAIL });
+  it("saves the post for the logged-in user, clears the list cache and opens the post", async () => {
+    const author = await logIn();
 
     await expect(
       createPost(
@@ -59,23 +73,25 @@ describe("createPost", () => {
     ).rejects.toThrow("REDIRECT /posts/1?toast=published");
 
     expect(await posts.findPostById(1)).toMatchObject({
-      authorId: demo.id,
+      authorId: author.id,
       title: "Big-O",
     });
     expect(updateTag).toHaveBeenCalledWith("posts");
   });
 
-  it("explains what to do when there is no demo user", async () => {
+  it("sends a visitor who isn't logged in to the login page, and saves nothing", async () => {
     await expect(
       createPost(
         empty,
         form({ title: "Big-O", content: "Count the steps first." }),
       ),
-    ).rejects.toThrow('Run "pnpm db:seed" first');
+    ).rejects.toThrow("REDIRECT /login?next=%2Fposts%2Fnew");
+
+    expect(await countPosts()).toBe(0);
   });
 
-  it("returns the errors and the typed values, and saves nothing (Task 2)", async () => {
-    await makeUser({ username: "demo", email: DEMO_EMAIL });
+  it("returns the errors and the typed values, and saves nothing", async () => {
+    await logIn();
     const typed = { title: "  ", content: "short" };
 
     const state = await createPost(empty, form(typed));
@@ -99,6 +115,7 @@ describe("updatePost", () => {
 
   it("saves the changes, clears both caches and opens the post", async () => {
     const post = await makePost();
+    await logIn();
 
     await expect(
       updatePost(
@@ -113,8 +130,9 @@ describe("updatePost", () => {
     expect(updateTag).toHaveBeenCalledWith(`post:${post.id}`);
   });
 
-  it("returns errors and leaves the post unchanged (Task 2)", async () => {
+  it("returns errors and leaves the post unchanged", async () => {
     const post = await makePost();
+    await logIn();
 
     const state = await updatePost(
       post.id,
@@ -129,6 +147,7 @@ describe("updatePost", () => {
   });
 
   it("answers 'not found' for a post that doesn't exist", async () => {
+    await logIn();
     await expect(
       updatePost(
         999,
@@ -136,6 +155,20 @@ describe("updatePost", () => {
         form({ title: "New title", content: "New content here." }),
       ),
     ).rejects.toThrow("NOT_FOUND");
+  });
+
+  it("refuses a visitor who isn't logged in, and changes nothing", async () => {
+    const post = await makePost();
+
+    await expect(
+      updatePost(
+        post.id,
+        empty,
+        form({ title: "Hacked", content: "Changed without logging in." }),
+      ),
+    ).rejects.toThrow(`REDIRECT /login?next=%2Fposts%2F${post.id}%2Fedit`);
+
+    expect((await posts.findPostById(post.id))?.title).toBe("Old title");
   });
 });
 
@@ -147,6 +180,7 @@ describe("deletePost", () => {
       title: "Bye",
       content: "This post will be deleted.",
     });
+    await logIn();
 
     await expect(deletePost(post.id)).rejects.toThrow(
       "REDIRECT /?toast=deleted",
@@ -168,6 +202,19 @@ describe("deletePost", () => {
     // A Server Action is a public endpoint: someone can send any value, not just numbers.
     const attack = "1 OR 1=1" as unknown as number;
     await expect(deletePost(attack)).rejects.toThrow("NOT_FOUND");
+
+    expect(await countPosts()).toBe(1);
+  });
+
+  it("refuses a visitor who isn't logged in, and deletes nothing", async () => {
+    const author = await makeUser();
+    const post = await posts.createPost({
+      authorId: author.id,
+      title: "Stay",
+      content: "This post must stay.",
+    });
+
+    await expect(deletePost(post.id)).rejects.toThrow("REDIRECT /login");
 
     expect(await countPosts()).toBe(1);
   });

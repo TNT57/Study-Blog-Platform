@@ -2,26 +2,17 @@
 // CONTROLLER (changes) for posts: Server Actions.
 //
 // Every function exported from a "use server" file is a PUBLIC endpoint: anyone can call it
-// with a POST request, without using our forms. So each action checks its input itself.
-// (From M3 it also checks who is logged in, and from M4 who may change the post.)
+// with a POST request, without using our forms. So each action checks its input itself,
+// and who is logged in. (From M4 it also checks who may change THIS post.)
 
 import { updateTag } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 
-import { DEMO_EMAIL } from "@/lib/demo";
 import { parseId } from "@/lib/search-params";
 import { parsePostForm, type PostFormState } from "@/lib/validation/post";
 import * as posts from "@/models/post.model";
-import { findUserByEmail } from "@/models/user.model";
 
-// Temporary until M3 (login): every new post belongs to the seeded "demo" user.
-async function getAuthorId(): Promise<number> {
-  const demo = await findUserByEmail(DEMO_EMAIL);
-  if (!demo) {
-    throw new Error('There is no demo user yet. Run "pnpm db:seed" first.');
-  }
-  return demo.id;
-}
+import { requireUser } from "./session";
 
 // An id comes from the page, but the browser can send any value. Check it again here.
 function checkId(id: unknown): number {
@@ -35,11 +26,12 @@ export async function createPost(
   _previous: PostFormState,
   formData: FormData,
 ): Promise<PostFormState> {
+  // Who is asking comes from the session cookie, never from the form.
+  const user = await requireUser("/posts/new");
   const result = parsePostForm(formData);
   if (!result.success) return result.state;
 
-  const authorId = await getAuthorId();
-  const post = await posts.createPost({ authorId, ...result.data });
+  const post = await posts.createPost({ authorId: user.id, ...result.data });
 
   updateTag("posts"); // the list must show the new post
   redirect(`/posts/${post.id}?toast=published`);
@@ -52,6 +44,7 @@ export async function updatePost(
   formData: FormData,
 ): Promise<PostFormState> {
   const postId = checkId(id);
+  await requireUser(`/posts/${postId}/edit`); // M4: and only the author or an admin
   const result = parsePostForm(formData);
   if (!result.success) return result.state;
 
@@ -66,6 +59,7 @@ export async function updatePost(
 /** Deletes a post, then goes back to the list. Use it as deletePost.bind(null, post.id). */
 export async function deletePost(id: number): Promise<void> {
   const postId = checkId(id);
+  await requireUser(`/posts/${postId}`); // M4: and only the author or an admin
   await posts.deletePost(postId);
 
   updateTag("posts");

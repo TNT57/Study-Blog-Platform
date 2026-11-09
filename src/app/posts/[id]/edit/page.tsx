@@ -7,6 +7,7 @@ import { PostForm } from "@/components/post-form";
 import { PostFormSkeleton } from "@/components/skeletons";
 import { updatePost } from "@/controllers/post.actions";
 import { getPost } from "@/controllers/post.queries";
+import { requireUser } from "@/controllers/session";
 import { parseId } from "@/lib/search-params";
 
 export const metadata: Metadata = { title: "Edit post" };
@@ -38,7 +39,9 @@ async function EditForm({
   params: PageProps<"/posts/[id]/edit">["params"];
 }) {
   const id = parseId((await params).id);
-  const post = id === null ? null : await getPost(id);
+  if (id === null) notFound();
+  await requireUser(`/posts/${id}/edit`); // M4: and only the author or an admin
+  const post = await getPost(id);
   if (!post) notFound();
 
   return (

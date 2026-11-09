@@ -10,6 +10,9 @@ const MESSAGES: Record<string, string> = {
   published: "Post published.",
   saved: "Changes saved.",
   deleted: "Post deleted.",
+  welcome: "Welcome! Your account is ready.",
+  "logged-in": "Logged in.",
+  "logged-out": "Logged out.",
 };
 
 export function Toast() {

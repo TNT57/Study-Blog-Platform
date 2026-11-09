@@ -1,10 +1,10 @@
 // The bar at the top of every page (from the Home board on the design canvas).
-import { PenLine, Timer } from "lucide-react";
+import { Timer } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { NavLink, PlainNavLink } from "@/components/nav-link";
-import { buttonVariants } from "@/components/ui/button";
+import { UserMenu, UserMenuSkeleton } from "@/components/user-menu";
 
 export function SiteHeader() {
   return (
@@ -15,8 +15,7 @@ export function SiteHeader() {
             <Timer className="size-6 text-primary" aria-hidden="true" />
             <span className="text-h3 tracking-tight">Study Blog</span>
           </Link>
-          {/* On phones the logo is the way home. The phone menu button (HomePhone board)
-              comes in M3, together with Log in, Sign up and Log out. */}
+          {/* On phones, the menu button in UserMenu has the links instead. */}
           <nav aria-label="Main" className="hidden gap-1 sm:flex">
             {/* The current URL is only known per request on some pages (like /posts/12). */}
             <Suspense fallback={<PlainNavLink href="/">Posts</PlainNavLink>}>
@@ -27,11 +26,10 @@ export function SiteHeader() {
             {/* "Study" (the Pomodoro timer) joins the menu in M5. */}
           </nav>
         </div>
-        {/* From M3, only logged-in users see this button, and the user menu streams in here. */}
-        <Link href="/posts/new" className={buttonVariants()}>
-          <PenLine aria-hidden="true" />
-          New post
-        </Link>
+        {/* Depends on the login cookie, so it streams in after the static shell. */}
+        <Suspense fallback={<UserMenuSkeleton />}>
+          <UserMenu />
+        </Suspense>
       </div>
     </header>
   );

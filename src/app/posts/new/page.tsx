@@ -1,9 +1,11 @@
-// VIEW: write a new post (the Editor board, "new" mode).
-// Nothing here depends on the request, so the whole page is static.
+// VIEW: write a new post (the Editor board, "new" mode). You must be logged in.
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { PostForm } from "@/components/post-form";
+import { PostFormSkeleton } from "@/components/skeletons";
 import { createPost } from "@/controllers/post.actions";
+import { requireUser } from "@/controllers/session";
 
 export const metadata: Metadata = { title: "New post" };
 
@@ -19,13 +21,24 @@ export default function NewPostPage() {
           Share something you learned. Short is fine.
         </p>
       </div>
-      <PostForm
-        action={createPost}
-        initialValues={{ title: "", content: "" }}
-        submitLabel="Publish post"
-        pendingLabel="Publishing…"
-        cancelHref="/"
-      />
+      {/* Checking the login cookie happens per request, so the form streams in. */}
+      <Suspense fallback={<PostFormSkeleton />}>
+        <NewPostForm />
+      </Suspense>
     </main>
+  );
+}
+
+async function NewPostForm() {
+  // Not logged in? To the login page, and back here afterwards.
+  await requireUser("/posts/new");
+  return (
+    <PostForm
+      action={createPost}
+      initialValues={{ title: "", content: "" }}
+      submitLabel="Publish post"
+      pendingLabel="Publishing…"
+      cancelHref="/"
+    />
   );
 }

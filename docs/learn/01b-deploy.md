@@ -13,6 +13,8 @@
   - every pull request → a **preview** deploy (its own link, so you can click through a change before merging).
 - A **Neon PostgreSQL** database, added from the Vercel Marketplace. With **preview branches** on, each preview
   gets its own copy of the database, so a pull request can never break the real data.
+- **Sydney**: the app runs in Vercel's `syd1` region and the database in Neon's Sydney region, close to
+  readers in Australia and close to each other (every query crosses that distance).
 - The **build command** (`vercel.json`): `pnpm db:migrate && pnpm db:seed && pnpm build`.
   New migrations run before the new code goes live. (From M3, the seed leaves the build: real users sign up.)
 - Code changes for running on a server:

@@ -2,12 +2,18 @@ import { z } from "zod";
 
 // The settings the server needs, checked with Zod.
 // If one is missing or wrong, we stop with a clear message instead of a strange error later.
-const envSchema = z.object({
-  DATABASE_URL: z.url({
+const postgresUrl = (name: string) =>
+  z.url({
     protocol: /^postgres(ql)?$/,
-    error:
-      "DATABASE_URL must look like postgres://user:password@host:5432/database",
-  }),
+    error: `${name} must look like postgres://user:password@host:5432/database`,
+  });
+
+const envSchema = z.object({
+  // The app's connection. On Vercel + Neon this goes through a connection pooler.
+  DATABASE_URL: postgresUrl("DATABASE_URL"),
+  // Optional: a DIRECT connection (no pooler), set by the Neon integration on Vercel.
+  // Migrations use it, because their lock needs one connection from start to end.
+  DATABASE_URL_UNPOOLED: postgresUrl("DATABASE_URL_UNPOOLED").optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

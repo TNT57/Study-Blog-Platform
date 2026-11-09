@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@vercel/functions": "3.10.6",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",
     "lucide-react": "^1.67.0",
@@ -69,7 +70,7 @@
   "packageManager": "pnpm@11.28.9+sha512.35421cea2720eca3f5ad722b67e8ef18f4d3cd4745ed2fcfeb0dc288d4e9437fad3870d91ee6e83f268f0f6f7e0f62723317b19617bb45ee4333172ef51159f8",
   "description": "A study blog with a Pomodoro timer. A learning project for MVC, auth, databases, testing and CI/CD.",
   "engines": {
-    "node": ">=24"
+    "node": "24.x"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs,mts,cts}": [

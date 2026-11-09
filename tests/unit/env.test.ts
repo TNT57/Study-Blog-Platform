@@ -20,4 +20,21 @@ describe("parseEnv", () => {
       /postgres:\/\//,
     );
   });
+
+  it("works without DATABASE_URL_UNPOOLED (your laptop doesn't need it)", () => {
+    const env = parseEnv({
+      DATABASE_URL: "postgres://study:study@localhost:5432/study_blog",
+    });
+
+    expect(env.DATABASE_URL_UNPOOLED).toBeUndefined();
+  });
+
+  it("checks DATABASE_URL_UNPOOLED when it is set (on Vercel)", () => {
+    expect(() =>
+      parseEnv({
+        DATABASE_URL: "postgres://study:study@localhost:5432/study_blog",
+        DATABASE_URL_UNPOOLED: "not a url",
+      }),
+    ).toThrow(/DATABASE_URL_UNPOOLED/);
+  });
 });

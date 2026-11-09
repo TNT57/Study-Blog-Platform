@@ -7,8 +7,14 @@ import { getEnv } from "@/lib/env";
 import { runMigrations } from "@/lib/migrations";
 
 async function main() {
-  // A single direct connection (not the pool): migrations are a one-off job.
-  const client = new Client({ connectionString: getEnv().DATABASE_URL });
+  // A single DIRECT connection (not the pool): migrations are a one-off job.
+  // On Vercel + Neon, DATABASE_URL goes through a pooler (PgBouncer), which can hand each
+  // statement a different connection. Our advisory lock belongs to ONE connection, so
+  // migrations use the unpooled URL when there is one.
+  const env = getEnv();
+  const client = new Client({
+    connectionString: env.DATABASE_URL_UNPOOLED ?? env.DATABASE_URL,
+  });
   await client.connect();
   try {
     console.log("Running migrations...");

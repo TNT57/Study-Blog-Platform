@@ -1,3 +1,4 @@
+import { attachDatabasePool } from "@vercel/functions";
 import { Pool, types, type QueryResultRow } from "pg";
 
 import { getEnv } from "./env";
@@ -16,10 +17,15 @@ types.setTypeParser(types.builtins.DATE, (value: string) => value);
 const globalForDb = globalThis as unknown as { pool?: Pool };
 
 export function getPool(): Pool {
-  globalForDb.pool ??= new Pool({
-    connectionString: getEnv().DATABASE_URL,
-    max: 5,
-  });
+  if (!globalForDb.pool) {
+    globalForDb.pool = new Pool({
+      connectionString: getEnv().DATABASE_URL,
+      max: 5,
+    });
+    // On Vercel, a function can be paused between requests. This closes idle connections
+    // first, so they don't pile up on the database. Anywhere else it does nothing.
+    attachDatabasePool(globalForDb.pool);
+  }
   return globalForDb.pool;
 }
 

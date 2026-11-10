@@ -62,6 +62,13 @@ pnpm dev
 
 Then open <http://localhost:3000>.
 
+## Deploy
+
+Vercel builds every push: `main` goes to production, and every pull request gets its own preview link.
+The database is Neon PostgreSQL (added from the Vercel Marketplace), with a separate database branch for each preview.
+The build command in `vercel.json` runs the migrations first, so a failed migration never goes live.
+How it works: [`docs/learn/01b-deploy.md`](docs/learn/01b-deploy.md).
+
 ## Scripts
 
 | Command             | What it does                                            |
@@ -115,7 +122,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **D** Design every screen in Claude Design
 - [x] **M0** Project setup + CI
 - [x] **M1** Database + models (PostgreSQL, raw SQL, migrations, Docker)
-- [ ] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
+- [x] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
 - [x] **M2** Posts CRUD with MVC
 - [ ] **M3** Authentication (register, login, logout, sessions)
 - [ ] **M4** Authorization (only the owner or an admin can edit)

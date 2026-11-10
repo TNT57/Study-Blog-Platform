@@ -30,6 +30,8 @@ export type PostPage = {
 
 export type PostDetail = {
   id: number;
+  /** Needed by canEditPost() to know whose post this is. */
+  authorId: number;
   title: string;
   content: string;
   authorUsername: string;
@@ -76,6 +78,7 @@ export async function getPost(id: number): Promise<PostDetail | null> {
 
   return {
     id: post.id,
+    authorId: post.authorId,
     title: post.title,
     content: post.content,
     authorUsername: author?.username ?? "unknown",

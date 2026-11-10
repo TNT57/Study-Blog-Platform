@@ -11,6 +11,7 @@ import { deletePost } from "@/controllers/post.actions";
 import { getPost } from "@/controllers/post.queries";
 import { getCurrentUser } from "@/controllers/session";
 import { formatPostDate, initialOf, toParagraphs } from "@/lib/format";
+import { canEditPost } from "@/lib/policies";
 import { parseId } from "@/lib/search-params";
 
 export default function PostPage({ params }: PageProps<"/posts/[id]">) {
@@ -76,8 +77,8 @@ async function PostArticle({
               </span>
             </span>
           </div>
-          {/* Logged-in users see these. M4: only the author or an admin. */}
-          {user && (
+          {/* Only the author or an admin sees these. The actions check the same rule again. */}
+          {canEditPost(user, post) && (
             <div className="flex gap-2">
               <Link
                 href={`/posts/${post.id}/edit`}

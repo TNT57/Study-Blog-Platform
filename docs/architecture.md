@@ -20,7 +20,7 @@ flowchart TB
     M["src/models/*.model.ts"]
   end
   DB[("PostgreSQL<br/>src/lib/db.ts (pool)")]
-  LIB["src/lib/<br/>validation, format, search-params, env"]
+  LIB["src/lib/<br/>validation, policies, format, search-params, env"]
 
   APP --> Q
   APP --> A
@@ -52,8 +52,8 @@ tests prove nothing else broke.
   a page needs, so `password_hash` can't leak). `import "server-only"` makes the build fail if a
   Client Component ever imports them.
 - **Writes** (`*.actions.ts`) are **public endpoints**: anyone can POST to them. Each one checks its
-  input with Zod, checks who is asking (`requireUser()`; from M4 also who may change it), then calls the model, then `updateTag(...)`,
-  then `redirect(...)`.
+  input, checks who is asking (`requireUser()`) and whether they may do it (`canEditPost()`), then calls the model,
+  then `updateTag(...)`, then `redirect(...)`.
 
 ## Who is asking? (M3)
 
@@ -62,6 +62,16 @@ tests prove nothing else broke.
 - Every Server Action that changes data calls `requireUser()` **itself**. Hiding a button is not security, and
   `src/proxy.ts` (a quick "is there a cookie at all?" redirect) isn't either.
 - Pure helpers with no database live in `src/lib/auth/` (password hashing, tokens, cookie settings, the `?next=` check).
+
+## What may they do? (M4)
+
+- `src/lib/policies.ts` holds the rules as pure functions. `canEditPost(user, post)`: the author or an admin, never a guest.
+- The **same** function is used in three places:
+  - the actions `updatePost` / `deletePost`: **the real protection**. No post → `notFound()` (404), not allowed → `forbidden()` (403);
+  - the edit page: someone else's post shows `src/app/forbidden.tsx`;
+  - the post page: Edit and Delete only show when it says yes (comfort only).
+- The permission is checked **before** the form is read, so a stranger learns nothing from validation errors.
+- `forbidden()` is experimental in Next.js 16: it needs `experimental.authInterrupts` in `next.config.ts`.
 
 ## Rendering (Cache Components)
 
@@ -73,7 +83,7 @@ skeleton from the Loading board first.
 | --------------------- | ---------------------------- | ----------------------------------- |
 | `/`                   | header, heading, "About" box | the post list (cached, tag `posts`) |
 | `/posts/[id]`         | header, "All posts" link     | the post (cached, tag `post:<id>`)  |
-| `/posts/[id]/edit`    | header, heading              | the form with the post's text       |
+| `/posts/[id]/edit`    | header, heading              | the form, after the owner check     |
 | `/posts/new`          | header, heading              | the form, after the login check     |
 | `/login`, `/register` | header, heading              | the form (it reads `?next=`)        |
 

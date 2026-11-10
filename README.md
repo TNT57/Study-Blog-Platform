@@ -1,6 +1,10 @@
 # Study Blog Platform
 
+[![CI](https://github.com/TNT57/Study-Blog-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/TNT57/Study-Blog-Platform/actions/workflows/ci.yml)
+
 A study blog where students write about what they learn and track their focus time with a Pomodoro timer.
+
+**Live:** <https://study-blog-platform.vercel.app>
 
 This is a **learning project**. The goal is to practise real Software Engineering skills:
 MVC architecture, authentication and authorization, databases (raw SQL first, then an ORM),
@@ -133,7 +137,8 @@ See [`docs/architecture.md`](docs/architecture.md).
 
 ## How we work
 
-1. Make a branch, never commit straight to `main`.
+1. Make a branch, never commit straight to `main`. One branch per milestone, named after the
+   Conventional Commit type, for example `feat/m3-auth` or `fix/login-redirect`. It is deleted after the merge.
 2. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/), for example `feat: add post list`. A Git hook checks this, and CI checks it again.
 3. Before each commit, a hook formats and lints the changed files.
 4. Open a pull request. CI must pass before merging. We squash merge, so the PR title must be a Conventional Commit too.

@@ -21,19 +21,18 @@ export function sessionCookieName(production = isProduction): string {
 }
 
 /**
- * The settings for the login cookie.
- *
- * TODO(you): Task 1 in docs/learn/03-auth.md.
- * Right now the cookie has no protection. Add the 3 safety settings from the table in the note:
- * httpOnly, secure (only in production) and sameSite.
+ * The settings for the login cookie (the table in docs/learn/03-auth.md):
+ * httpOnly (page scripts can't read it), secure (https only, in production) and sameSite (no CSRF).
  */
 export function sessionCookieOptions(
   expiresAt: Date,
   production = isProduction,
 ): SessionCookieOptions {
-  void production; // you will need this in Task 1
   return {
     path: "/",
     expires: expiresAt,
+    httpOnly: true,
+    secure: production,
+    sameSite: "lax",
   };
 }

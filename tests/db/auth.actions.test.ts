@@ -157,11 +157,23 @@ describe("login", () => {
     expect(cookieJar.values.size).toBe(0);
   });
 
-  // TODO(you): Task 2 in docs/learn/03-auth.md.
-  // Replace the line inside with a real test: log in as "trung@example.com" with a WRONG
-  // password, then check the 3 things the note lists.
   it("refuses a wrong password with exactly the same message (Task 2)", async () => {
-    throw new Error("TODO(you): write this test (Task 2)");
+    // 1. Trung has an account, but this password is wrong
+    const wrongPassword = await login(
+      emptyLogin,
+      form({ email: "trung@example.com", password: "wrong" }),
+    );
+
+    // 2. Nobody has this email
+    const unknownEmail = await login(
+      emptyLogin,
+      form({ email: "unknown@example.com", password: "password" }),
+    );
+
+    // 3. The checks
+    expect(wrongPassword.error).toBe("Email or password is incorrect.");
+    expect(unknownEmail.error).toBe(wrongPassword.error); // both messages are exactly the same
+    expect(cookieJar.values.size).toBe(0); // nobody got logged in
   });
 
   it("can't log in as a user whose password hash isn't real (like the seeded demo user)", async () => {

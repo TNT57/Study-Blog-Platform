@@ -93,3 +93,20 @@ export function PostFormSkeleton() {
     </Loading>
   );
 }
+
+export function AuthFormSkeleton({ fields }: { fields: number }) {
+  return (
+    <Loading
+      label="Loading the form…"
+      className="flex flex-col gap-4.5 rounded-xl border border-border bg-card p-7"
+    >
+      {Array.from({ length: fields }, (_, field) => (
+        <div key={field} className="flex flex-col gap-1.5">
+          <Bone className="h-4 w-20" />
+          <Bone className="h-11 w-full" />
+        </div>
+      ))}
+      <Bone className="mt-1 h-11 w-full" />
+    </Loading>
+  );
+}

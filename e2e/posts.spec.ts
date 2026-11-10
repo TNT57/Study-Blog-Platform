@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { registerNewUser } from "./helpers";
+
 // Next.js keeps pages you visited alive but hidden, so the same form can be in the page twice.
 // getByRole only finds what is visible (it reads the accessibility tree), so we use it everywhere.
 
@@ -7,9 +9,10 @@ import { expect, test } from "@playwright/test";
 test("write, read, edit and delete a post", async ({ page }) => {
   const title = `A note from Playwright ${Date.now()}`;
   const editedTitle = `${title} (edited)`;
+  // Since M3 you must be logged in to write. A fresh account for every run.
+  await registerNewUser(page);
 
   await test.step("write it", async () => {
-    await page.goto("/");
     await page.getByRole("link", { name: "New post" }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: "New post" }),
@@ -74,10 +77,11 @@ test("a post that doesn't exist shows the not-found page", async ({ page }) => {
   ).toBeVisible();
 });
 
-// Green after your Tasks 1 and 2 (docs/learn/02-posts-crud.md).
+// The M2 pair tasks: the post rules and the "validation failed" branch.
 test("a form with problems explains them and keeps the text", async ({
   page,
 }) => {
+  await registerNewUser(page);
   await page.goto("/posts/new");
   // Only spaces pass the browser's `required` check, so the server's rules must catch it.
   await page.getByRole("textbox", { name: "Title" }).fill("   ");

@@ -52,8 +52,16 @@ tests prove nothing else broke.
   a page needs, so `password_hash` can't leak). `import "server-only"` makes the build fail if a
   Client Component ever imports them.
 - **Writes** (`*.actions.ts`) are **public endpoints**: anyone can POST to them. Each one checks its
-  input with Zod (and from M3/M4, who is asking), then calls the model, then `updateTag(...)`,
+  input with Zod, checks who is asking (`requireUser()`; from M4 also who may change it), then calls the model, then `updateTag(...)`,
   then `redirect(...)`.
+
+## Who is asking? (M3)
+
+- `src/controllers/session.ts` reads the login cookie: `getCurrentUser()` hashes the token and finds a valid session.
+  Pages call it inside `<Suspense>` (it reads a cookie, so it's per request). React's `cache()` makes it run once per request.
+- Every Server Action that changes data calls `requireUser()` **itself**. Hiding a button is not security, and
+  `src/proxy.ts` (a quick "is there a cookie at all?" redirect) isn't either.
+- Pure helpers with no database live in `src/lib/auth/` (password hashing, tokens, cookie settings, the `?next=` check).
 
 ## Rendering (Cache Components)
 
@@ -61,12 +69,13 @@ The page frame (the **static shell**) is built once and sent at once. Anything t
 (the URL's `?before=`, the post id, later the login cookie) streams in inside `<Suspense>`, with a
 skeleton from the Loading board first.
 
-| Page               | In the static shell          | Streams in                          |
-| ------------------ | ---------------------------- | ----------------------------------- |
-| `/`                | header, heading, "About" box | the post list (cached, tag `posts`) |
-| `/posts/[id]`      | header, "All posts" link     | the post (cached, tag `post:<id>`)  |
-| `/posts/[id]/edit` | header, heading              | the form with the post's text       |
-| `/posts/new`       | everything (fully static)    | —                                   |
+| Page                  | In the static shell          | Streams in                          |
+| --------------------- | ---------------------------- | ----------------------------------- |
+| `/`                   | header, heading, "About" box | the post list (cached, tag `posts`) |
+| `/posts/[id]`         | header, "All posts" link     | the post (cached, tag `post:<id>`)  |
+| `/posts/[id]/edit`    | header, heading              | the form with the post's text       |
+| `/posts/new`          | header, heading              | the form, after the login check     |
+| `/login`, `/register` | header, heading              | the form (it reads `?next=`)        |
 
 `pnpm build` shows this: `○` = fully static, `◐` = static shell + streamed parts.
 No page reads the database while building, so the build doesn't need a database.

@@ -9,6 +9,7 @@ import { PostDetailSkeleton } from "@/components/skeletons";
 import { buttonVariants } from "@/components/ui/button";
 import { deletePost } from "@/controllers/post.actions";
 import { getPost } from "@/controllers/post.queries";
+import { getCurrentUser } from "@/controllers/session";
 import { formatPostDate, initialOf, toParagraphs } from "@/lib/format";
 import { parseId } from "@/lib/search-params";
 
@@ -41,6 +42,8 @@ async function PostArticle({
   const id = parseId((await params).id);
   const post = id === null ? null : await getPost(id);
   if (!post) notFound();
+  // Only for showing or hiding the buttons. The real check is in the actions.
+  const user = await getCurrentUser();
 
   return (
     <article className="flex flex-col gap-7">
@@ -73,20 +76,22 @@ async function PostArticle({
               </span>
             </span>
           </div>
-          {/* Until M4 everyone sees these. M4 shows them only to the author or an admin. */}
-          <div className="flex gap-2">
-            <Link
-              href={`/posts/${post.id}/edit`}
-              className={buttonVariants({ variant: "outline" })}
-            >
-              <PenLine aria-hidden="true" />
-              Edit
-            </Link>
-            <DeletePostButton
-              postTitle={post.title}
-              action={deletePost.bind(null, post.id)}
-            />
-          </div>
+          {/* Logged-in users see these. M4: only the author or an admin. */}
+          {user && (
+            <div className="flex gap-2">
+              <Link
+                href={`/posts/${post.id}/edit`}
+                className={buttonVariants({ variant: "outline" })}
+              >
+                <PenLine aria-hidden="true" />
+                Edit
+              </Link>
+              <DeletePostButton
+                postTitle={post.title}
+                action={deletePost.bind(null, post.id)}
+              />
+            </div>
+          )}
         </div>
       </header>
 

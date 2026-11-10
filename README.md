@@ -1,6 +1,10 @@
 # Study Blog Platform
 
+[![CI](https://github.com/TNT57/Study-Blog-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/TNT57/Study-Blog-Platform/actions/workflows/ci.yml)
+
 A study blog where students write about what they learn and track their focus time with a Pomodoro timer.
+
+**Live:** <https://study-blog-platform.vercel.app>
 
 This is a **learning project**. The goal is to practise real Software Engineering skills:
 MVC architecture, authentication and authorization, databases (raw SQL first, then an ORM),
@@ -17,7 +21,7 @@ Each milestone is one pull request with a short learning note in [`docs/learn/`]
 | UI              | Tailwind CSS v4 + shadcn/ui (Base UI)                         |
 | Design          | Claude Design canvas (style guide + every screen)             |
 | Database        | PostgreSQL 17 (from M1): raw SQL with `pg`, Drizzle ORM in M8 |
-| Auth            | Built by hand: Argon2id + database sessions (from M3)         |
+| Auth            | Built by hand: Argon2id + database sessions                   |
 | Tests           | Vitest + Testing Library, Playwright (from M2)                |
 | Code quality    | ESLint, Prettier, Husky + lint-staged, Conventional Commits   |
 | CI / CD         | GitHub Actions, Dependabot, Vercel + Neon (from M1)           |
@@ -124,7 +128,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **M1** Database + models (PostgreSQL, raw SQL, migrations, Docker)
 - [x] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
 - [x] **M2** Posts CRUD with MVC
-- [ ] **M3** Authentication (register, login, logout, sessions)
+- [x] **M3** Authentication (register, login, logout, sessions)
 - [ ] **M4** Authorization (only the owner or an admin can edit)
 - [ ] **M5** Pomodoro timer + study stats
 - [ ] **M6** End-to-end tests + accessibility checks
@@ -133,7 +137,8 @@ See [`docs/architecture.md`](docs/architecture.md).
 
 ## How we work
 
-1. Make a branch, never commit straight to `main`.
+1. Make a branch, never commit straight to `main`. One branch per milestone, named after the
+   Conventional Commit type, for example `feat/m3-auth` or `fix/login-redirect`. It is deleted after the merge.
 2. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/), for example `feat: add post list`. A Git hook checks this, and CI checks it again.
 3. Before each commit, a hook formats and lints the changed files.
 4. Open a pull request. CI must pass before merging. We squash merge, so the PR title must be a Conventional Commit too.

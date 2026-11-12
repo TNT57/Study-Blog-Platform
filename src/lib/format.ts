@@ -51,3 +51,24 @@ export function toParagraphs(content: string): string[] {
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 }
+
+/** Focus time for the stats: 0 → "0 min", 50 → "50 min", 250 → "4 h 10 m", 120 → "2 h". */
+export function formatMinutes(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest === 0 ? `${hours} h` : `${hours} h ${rest} m`;
+}
+
+const weekdayFormat = new Intl.DateTimeFormat("en-AU", {
+  weekday: "short",
+  timeZone: "UTC",
+});
+
+/**
+ * The short weekday of a calendar day: "2026-11-12" → "Thu".
+ * The day is already the user's own day, so we read it in UTC: no time zone can shift it.
+ */
+export function weekdayOf(day: string): string {
+  return weekdayFormat.format(new Date(`${day}T00:00:00Z`));
+}

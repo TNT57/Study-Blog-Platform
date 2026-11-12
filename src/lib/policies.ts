@@ -13,12 +13,14 @@ export type OwnedPost = { authorId: number };
 
 /**
  * May this person edit or delete this post?
- *
- * TODO(you): Task 1 in docs/learn/04-authorization.md.
- * Right now this is still M3's rule: anyone who is logged in.
- * The real rule: the post's author, or an admin. A guest never.
+ * The post's author, or an admin. A guest never. Anyone else never (deny by default).
  */
 export function canEditPost(actor: Actor, post: OwnedPost): boolean {
-  void post; // you will need this in Task 1
-  return actor !== null;
+  if (actor === null) {
+    return false; // a guest
+  }
+  if (actor.role === "admin" || actor.id === post.authorId) {
+    return true; // the admin or the author
+  }
+  return false; // anyone else
 }

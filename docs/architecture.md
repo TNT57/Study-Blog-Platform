@@ -20,7 +20,7 @@ flowchart TB
     M["src/models/*.model.ts"]
   end
   DB[("PostgreSQL<br/>src/lib/db.ts (pool)")]
-  LIB["src/lib/<br/>validation, policies, format, search-params, env"]
+  LIB["src/lib/<br/>validation, policies, pomodoro, format, search-params, env"]
 
   APP --> Q
   APP --> A
@@ -73,6 +73,16 @@ tests prove nothing else broke.
 - The permission is checked **before** the form is read, so a stranger learns nothing from validation errors.
 - `forbidden()` is experimental in Next.js 16: it needs `experimental.authInterrupts` in `next.config.ts`.
 
+## The Study page (M5): server and browser together
+
+- **Server:** `requireUser()`, then `getStudyStats()` (6 small SQL queries in `study-session.model.ts`), shown by
+  `StudyStatsView` (a Server Component: HTML only).
+- **Browser:** `PomodoroTimer` (`"use client"`). The rules are pure functions in `src/lib/pomodoro.ts`; the component only
+  connects them to buttons, `localStorage` (keys include the user id) and the Server Action `saveStudySession`.
+- **Saving a round:** the browser sends `{ durationMinutes, topic }` only. The server sets the user (session) and the
+  day (`(now() AT TIME ZONE users.time_zone)::date`), then calls `refresh()` so the stats render again.
+- **No cache** for the stats: they belong to one user and change after every round, so they are read per request.
+
 ## Rendering (Cache Components)
 
 The page frame (the **static shell**) is built once and sent at once. Anything that needs the request
@@ -86,6 +96,7 @@ skeleton from the Loading board first.
 | `/posts/[id]/edit`    | header, heading              | the form, after the owner check     |
 | `/posts/new`          | header, heading              | the form, after the login check     |
 | `/login`, `/register` | header, heading              | the form (it reads `?next=`)        |
+| `/study`              | header, heading              | the timer, then the stats           |
 
 `pnpm build` shows this: `○` = fully static, `◐` = static shell + streamed parts.
 No page reads the database while building, so the build doesn't need a database.

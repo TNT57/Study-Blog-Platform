@@ -16,5 +16,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Only the pages that need a login.
-  matcher: ["/posts/new", "/posts/:id/edit"],
+  matcher: ["/posts/new", "/posts/:id/edit", "/study"],
 };

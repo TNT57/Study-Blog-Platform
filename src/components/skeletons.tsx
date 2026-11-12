@@ -110,3 +110,61 @@ export function AuthFormSkeleton({ fields }: { fields: number }) {
     </Loading>
   );
 }
+
+/** The stats column of the Study page (the Loading board, "Loading your stats…"). */
+export function StudyStatsSkeleton() {
+  const card = "rounded-xl border border-border bg-card";
+  return (
+    <Loading label="Loading your stats…" className="flex flex-col gap-4">
+      <div className="flex flex-wrap gap-3">
+        {[1, 2, 3].map((tile) => (
+          <div
+            key={tile}
+            className={cn(
+              card,
+              "flex flex-[1_1_8.75rem] flex-col gap-2.5 p-4.5",
+            )}
+          >
+            <Bone className="h-3 w-15" />
+            <Bone className="h-7 w-27.5" />
+            <Bone className="h-3 w-20" />
+          </div>
+        ))}
+      </div>
+      <div className={cn(card, "flex flex-col gap-4 p-5.5")}>
+        <Bone className="h-4.5 w-30" />
+        <div className="flex h-50 items-end gap-2.5">
+          {["h-22", "h-15", "h-8", "h-30", "h-38", "h-22", "h-15"].map(
+            (height, bar) => (
+              <Bone key={bar} className={cn("flex-1 rounded-b-none", height)} />
+            ),
+          )}
+        </div>
+      </div>
+      <div className={cn(card, "flex flex-col gap-3.5 p-5.5")}>
+        <Bone className="h-4.5 w-45" />
+        <Bone className="h-2.5 w-full" />
+        <Bone className="h-2.5 w-4/5" />
+        <Bone className="h-2.5 w-3/5" />
+      </div>
+    </Loading>
+  );
+}
+
+/** The timer card, while the login is checked. */
+export function StudyTimerSkeleton() {
+  return (
+    <Loading
+      label="Loading the timer…"
+      className="flex min-w-0 flex-[1_1_27.5rem] flex-col gap-6 rounded-xl border border-border bg-card p-7 max-sm:p-5"
+    >
+      <Bone className="h-13 w-full rounded-[10px]" />
+      <Bone className="h-60 w-full rounded-xl" />
+      <div className="flex flex-col gap-1.5">
+        <Bone className="h-4 w-48" />
+        <Bone className="h-11 w-full" />
+      </div>
+      <Bone className="h-12 w-full" />
+    </Loading>
+  );
+}

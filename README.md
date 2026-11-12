@@ -129,7 +129,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **M1b** First deploy (Vercel + Neon, a preview link for every PR)
 - [x] **M2** Posts CRUD with MVC
 - [x] **M3** Authentication (register, login, logout, sessions)
-- [ ] **M4** Authorization (only the owner or an admin can edit)
+- [x] **M4** Authorization (only the owner or an admin can edit)
 - [ ] **M5** Pomodoro timer + study stats
 - [ ] **M6** End-to-end tests + accessibility checks
 - [ ] **M7** XSS lesson (Markdown, sanitizing, Content Security Policy)

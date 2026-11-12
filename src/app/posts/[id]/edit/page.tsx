@@ -1,6 +1,6 @@
 // VIEW: edit a post (the Editor board, "edit" mode).
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { PostForm } from "@/components/post-form";
@@ -8,6 +8,7 @@ import { PostFormSkeleton } from "@/components/skeletons";
 import { updatePost } from "@/controllers/post.actions";
 import { getPost } from "@/controllers/post.queries";
 import { requireUser } from "@/controllers/session";
+import { canEditPost } from "@/lib/policies";
 import { parseId } from "@/lib/search-params";
 
 export const metadata: Metadata = { title: "Edit post" };
@@ -40,9 +41,11 @@ async function EditForm({
 }) {
   const id = parseId((await params).id);
   if (id === null) notFound();
-  await requireUser(`/posts/${id}/edit`); // M4: and only the author or an admin
+  const user = await requireUser(`/posts/${id}/edit`);
   const post = await getPost(id);
   if (!post) notFound();
+  // Someone else's post: the 403 page (src/app/forbidden.tsx). The action checks again on save.
+  if (!canEditPost(user, post)) forbidden();
 
   return (
     <PostForm

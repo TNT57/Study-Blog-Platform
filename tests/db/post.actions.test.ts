@@ -2,7 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Outside Next.js these functions don't work, so we replace them with "mocks" that record calls.
-// The real redirect() and notFound() stop the action by throwing. Ours do the same.
+// The real redirect(), notFound() and forbidden() stop the action by throwing. Ours do the same.
 vi.mock("next/cache", () => ({
   updateTag: vi.fn(),
   cacheLife: vi.fn(),
@@ -20,6 +20,9 @@ vi.mock("next/navigation", () => ({
   notFound: vi.fn(() => {
     throw new Error("NOT_FOUND");
   }),
+  forbidden: vi.fn(() => {
+    throw new Error("FORBIDDEN");
+  }),
 }));
 
 import { updateTag } from "next/cache";
@@ -29,6 +32,7 @@ import { startSession } from "@/controllers/session";
 import { query } from "@/lib/db";
 import type { PostFormState } from "@/lib/validation/post";
 import * as posts from "@/models/post.model";
+import type { User } from "@/models/user.model";
 
 import { cookieJar } from "./cookie-jar";
 import { makeUser } from "./helpers";
@@ -54,6 +58,22 @@ async function logIn(overrides: Parameters<typeof makeUser>[0] = {}) {
   const user = await makeUser(overrides);
   await startSession(user.id);
   return user;
+}
+
+/** Logs in as a user who already exists (for example, a post's author). */
+async function logInAs(user: User) {
+  await startSession(user.id);
+}
+
+/** A post written by a new user. Returns both. */
+async function makePost(title = "Old title") {
+  const author = await makeUser();
+  const post = await posts.createPost({
+    authorId: author.id,
+    title,
+    content: "Old content, long enough.",
+  });
+  return { author, post };
 }
 
 beforeEach(() => {
@@ -104,18 +124,11 @@ describe("createPost", () => {
 });
 
 describe("updatePost", () => {
-  async function makePost() {
-    const author = await makeUser();
-    return posts.createPost({
-      authorId: author.id,
-      title: "Old title",
-      content: "Old content, long enough.",
-    });
-  }
+  const changes = form({ title: "New title", content: "New content here." });
 
-  it("saves the changes, clears both caches and opens the post", async () => {
-    const post = await makePost();
-    await logIn();
+  it("lets the author save the changes, clears both caches and opens the post", async () => {
+    const { author, post } = await makePost();
+    await logInAs(author);
 
     await expect(
       updatePost(
@@ -131,8 +144,8 @@ describe("updatePost", () => {
   });
 
   it("returns errors and leaves the post unchanged", async () => {
-    const post = await makePost();
-    await logIn();
+    const { author, post } = await makePost();
+    await logInAs(author);
 
     const state = await updatePost(
       post.id,
@@ -158,7 +171,7 @@ describe("updatePost", () => {
   });
 
   it("refuses a visitor who isn't logged in, and changes nothing", async () => {
-    const post = await makePost();
+    const { post } = await makePost();
 
     await expect(
       updatePost(
@@ -170,17 +183,44 @@ describe("updatePost", () => {
 
     expect((await posts.findPostById(post.id))?.title).toBe("Old title");
   });
+
+  // Red until Task 1 (docs/learn/04-authorization.md): today any logged-in user may edit.
+  it("refuses another user (403), and changes nothing", async () => {
+    const { post } = await makePost();
+    await logIn(); // someone else
+
+    await expect(updatePost(post.id, empty, changes)).rejects.toThrow(
+      "FORBIDDEN",
+    );
+
+    expect((await posts.findPostById(post.id))?.title).toBe("Old title");
+    expect(updateTag).not.toHaveBeenCalled();
+  });
+
+  it("checks the permission before the form, so a stranger learns nothing from errors", async () => {
+    const { post } = await makePost();
+    await logIn();
+
+    await expect(
+      updatePost(post.id, empty, form({ title: "", content: "short" })),
+    ).rejects.toThrow("FORBIDDEN");
+  });
+
+  it("lets an admin change anyone's post", async () => {
+    const { post } = await makePost();
+    await logIn({ role: "admin" });
+
+    await expect(updatePost(post.id, empty, changes)).rejects.toThrow(
+      `REDIRECT /posts/${post.id}?toast=saved`,
+    );
+    expect((await posts.findPostById(post.id))?.title).toBe("New title");
+  });
 });
 
 describe("deletePost", () => {
-  it("deletes the post, clears both caches and goes back to the list", async () => {
-    const author = await makeUser();
-    const post = await posts.createPost({
-      authorId: author.id,
-      title: "Bye",
-      content: "This post will be deleted.",
-    });
-    await logIn();
+  it("lets the author delete the post, clears both caches and goes back to the list", async () => {
+    const { author, post } = await makePost("Bye");
+    await logInAs(author);
 
     await expect(deletePost(post.id)).rejects.toThrow(
       "REDIRECT /?toast=deleted",
@@ -217,5 +257,26 @@ describe("deletePost", () => {
     await expect(deletePost(post.id)).rejects.toThrow("REDIRECT /login");
 
     expect(await countPosts()).toBe(1);
+  });
+
+  // Red until Task 1 (docs/learn/04-authorization.md).
+  it("refuses another user (403), and deletes nothing", async () => {
+    const { post } = await makePost("Stay");
+    await logIn(); // someone else
+
+    await expect(deletePost(post.id)).rejects.toThrow("FORBIDDEN");
+
+    expect(await countPosts()).toBe(1);
+    expect(updateTag).not.toHaveBeenCalled();
+  });
+
+  it("lets an admin delete anyone's post", async () => {
+    const { post } = await makePost("Spam");
+    await logIn({ role: "admin" });
+
+    await expect(deletePost(post.id)).rejects.toThrow(
+      "REDIRECT /?toast=deleted",
+    );
+    expect(await countPosts()).toBe(0);
   });
 });

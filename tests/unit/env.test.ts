@@ -29,6 +29,22 @@ describe("parseEnv", () => {
     expect(env.DATABASE_URL_UNPOOLED).toBeUndefined();
   });
 
+  it("asks for full certificate checks (verify-full) instead of Neon's sslmode=require", () => {
+    const env = parseEnv({
+      DATABASE_URL:
+        "postgresql://neon:secret@ep-x-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+    });
+
+    expect(env.DATABASE_URL).toBe(
+      "postgresql://neon:secret@ep-x-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=verify-full&channel_binding=require",
+    );
+  });
+
+  it("leaves a URL without sslmode (your laptop) exactly as it is", () => {
+    const url = "postgres://study:study@localhost:5432/study_blog";
+    expect(parseEnv({ DATABASE_URL: url }).DATABASE_URL).toBe(url);
+  });
+
   it("checks DATABASE_URL_UNPOOLED when it is set (on Vercel)", () => {
     expect(() =>
       parseEnv({

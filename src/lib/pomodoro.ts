@@ -154,10 +154,9 @@ export function advance(timer: TimerState): TimerState {
 
 /**
  * Seconds as a clock: 1500 → "25:00", 65 → "01:05", 0 → "00:00".
- *
- * TODO(you): Task 1 in docs/learn/05-pomodoro.md.
- * Right now it just shows the number of seconds, so the timer says "1500" instead of "25:00".
  */
 export function formatTime(totalSeconds: number): string {
-  return String(totalSeconds);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }

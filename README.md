@@ -130,7 +130,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **M2** Posts CRUD with MVC
 - [x] **M3** Authentication (register, login, logout, sessions)
 - [x] **M4** Authorization (only the owner or an admin can edit)
-- [ ] **M5** Pomodoro timer + study stats
+- [x] **M5** Pomodoro timer + study stats
 - [ ] **M6** End-to-end tests + accessibility checks
 - [ ] **M7** XSS lesson (Markdown, sanitizing, Content Security Policy)
 - [ ] **M8** Refactor the Model layer to Drizzle ORM

@@ -23,7 +23,11 @@ export function SiteHeader() {
                 Posts
               </NavLink>
             </Suspense>
-            {/* "Study" (the Pomodoro timer) joins the menu in M5. */}
+            <Suspense
+              fallback={<PlainNavLink href="/study">Study</PlainNavLink>}
+            >
+              <NavLink href="/study">Study</NavLink>
+            </Suspense>
           </nav>
         </div>
         {/* Depends on the login cookie, so it streams in after the static shell. */}

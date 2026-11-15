@@ -72,17 +72,20 @@ export type DayTotals = { minutes: number; rounds: number };
 
 /**
  * How many focus minutes and rounds this user finished on one day.
- * A day with no rounds is { minutes: 0, rounds: 0 }.
- *
- * TODO(you): Task 2 in docs/learn/05-pomodoro.md: write the SQL.
+ * A day with no rounds is { minutes: 0, rounds: 0 }: COALESCE turns the empty SUM (NULL) into 0.
  */
 export async function totalsOnDay(
   userId: number,
   day: string,
 ): Promise<DayTotals> {
-  void userId; // you will need these in Task 2
-  void day;
-  return { minutes: 0, rounds: 0 };
+  const rows = await query<DayTotals>(
+    `SELECT COALESCE(SUM(duration_minutes), 0)::int AS minutes,
+            COUNT(*)::int AS rounds
+     FROM study_sessions
+     WHERE user_id = $1 AND local_date = $2`,
+    [userId, day],
+  );
+  return rows[0];
 }
 
 /**

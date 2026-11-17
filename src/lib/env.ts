@@ -3,10 +3,28 @@ import { z } from "zod";
 // The settings the server needs, checked with Zod.
 // If one is missing or wrong, we stop with a clear message instead of a strange error later.
 const postgresUrl = (name: string) =>
-  z.url({
-    protocol: /^postgres(ql)?$/,
-    error: `${name} must look like postgres://user:password@host:5432/database`,
-  });
+  z
+    .url({
+      protocol: /^postgres(ql)?$/,
+      error: `${name} must look like postgres://user:password@host:5432/database`,
+    })
+    .transform(verifyFull);
+
+/**
+ * Neon's URLs say `sslmode=require`. Today the pg library already treats that as "verify-full"
+ * (check the certificate AND the host name), but it prints a long SECURITY WARNING in the logs,
+ * because pg v9 will make "require" weaker. Saying "verify-full" ourselves keeps the same safe
+ * behaviour, now and after pg v9, and keeps the logs clean.
+ */
+export function verifyFull(url: string): string {
+  const parsed = new URL(url);
+  const mode = parsed.searchParams.get("sslmode");
+  if (mode !== "prefer" && mode !== "require" && mode !== "verify-ca") {
+    return url; // no SSL setting (your laptop), or already verify-full: unchanged
+  }
+  parsed.searchParams.set("sslmode", "verify-full");
+  return parsed.toString();
+}
 
 const envSchema = z.object({
   // The app's connection. On Vercel + Neon this goes through a connection pooler.

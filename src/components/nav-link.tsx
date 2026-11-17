@@ -11,12 +11,15 @@ const baseClass =
   "inline-flex h-11 items-center rounded-lg px-3 text-label font-medium";
 const idleClass = "text-muted-foreground hover:text-foreground";
 
+/** The pages in the main menu. */
+type MenuHref = "/" | "/study";
+
 /** The same link without the "you are here" mark: the Suspense fallback while the URL loads. */
 export function PlainNavLink({
   href,
   children,
 }: {
-  href: "/";
+  href: MenuHref;
   children: ReactNode;
 }) {
   return (
@@ -31,7 +34,7 @@ export function NavLink({
   activePrefix,
   children,
 }: {
-  href: "/";
+  href: MenuHref;
   /** Also active on pages under this path, e.g. "/posts" for a single post. */
   activePrefix?: string;
   children: ReactNode;

@@ -55,6 +55,9 @@ export async function UserMenu() {
           <Link href="/" className={menuItem}>
             Posts
           </Link>
+          <Link href="/study" className={menuItem}>
+            Study
+          </Link>
           <Link href="/login" className={menuItem}>
             Log in
           </Link>
@@ -91,6 +94,9 @@ export async function UserMenu() {
         </span>
         <Link href="/" className={menuItem}>
           Posts
+        </Link>
+        <Link href="/study" className={menuItem}>
+          Study
         </Link>
         <Link href="/posts/new" className={menuItem}>
           <PenLine className="size-4" aria-hidden="true" />

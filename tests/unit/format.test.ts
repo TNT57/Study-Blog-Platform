@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  formatMinutes,
   formatPostDate,
   initialOf,
   makeExcerpt,
   toParagraphs,
   wasEdited,
+  weekdayOf,
 } from "@/lib/format";
 import { parseId } from "@/lib/search-params";
 
@@ -78,5 +80,24 @@ describe("parseId", () => {
   it("refuses a missing value or a list (?id=1&id=2)", () => {
     expect(parseId(undefined)).toBeNull();
     expect(parseId(["1", "2"])).toBeNull();
+  });
+});
+
+describe("formatMinutes", () => {
+  it.each([
+    [0, "0 min"],
+    [50, "50 min"],
+    [60, "1 h"],
+    [250, "4 h 10 m"],
+    [475, "7 h 55 m"],
+  ])("shows %i minutes as %s", (minutes, text) => {
+    expect(formatMinutes(minutes)).toBe(text);
+  });
+});
+
+describe("weekdayOf", () => {
+  it("names the weekday of a calendar day, in any server time zone", () => {
+    expect(weekdayOf("2026-11-12")).toBe("Thu");
+    expect(weekdayOf("2026-11-09")).toBe("Mon");
   });
 });

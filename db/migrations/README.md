@@ -15,9 +15,9 @@ and writes each finished file in the `schema_migrations` table (the "log book").
 
 ## Files
 
-| File                       | Milestone | What it does                               |
-| -------------------------- | --------- | ------------------------------------------ |
-| `0001_create_users.sql`    | M1        | The `users` table                          |
-| `0002_create_posts.sql`    | M1        | The `posts` table                          |
-| `0003_create_sessions.sql` | M3        | Login sessions (the SHA-256 of each token) |
-| `0004_create_study_...`    | M5        | Pomodoro sessions (later)                  |
+| File                             | Milestone | What it does                                                 |
+| -------------------------------- | --------- | ------------------------------------------------------------ |
+| `0001_create_users.sql`          | M1        | The `users` table                                            |
+| `0002_create_posts.sql`          | M1        | The `posts` table                                            |
+| `0003_create_sessions.sql`       | M3        | Login sessions (the SHA-256 of each token)                   |
+| `0004_create_study_sessions.sql` | M5        | Finished focus rounds (Pomodoro), with each user's local day |

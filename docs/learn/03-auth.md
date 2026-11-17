@@ -138,7 +138,7 @@ This time you write the **test**, not the code. In **`tests/db/auth.actions.test
 
 Your test should:
 
-1. log in as `trung@example.com` (the `beforeEach` already registered him, with the password `"coffee and code"`)
+1. log in as `trung@example.com` (the `beforeEach` already registered this account, with the password `"coffee and code"`)
    with a **wrong** password, and keep the returned state;
 2. log in with an email that **doesn't exist**, and keep that state too;
 3. check (with `expect`) that:

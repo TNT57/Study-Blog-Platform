@@ -83,6 +83,15 @@ tests prove nothing else broke.
   day (`(now() AT TIME ZONE users.time_zone)::date`), then calls `refresh()` so the stats render again.
 - **No cache** for the stats: they belong to one user and change after every round, so they are read per request.
 
+## When something breaks (M6)
+
+- `src/instrumentation.ts`: Next.js calls `onRequestError` for every server error (page, action, proxy). It prints one
+  JSON line (`toErrorReport()` in `src/lib/error-report.ts`): message, digest, path, route and where it failed. Never the
+  request headers (the login cookie) or the `?query`.
+- `src/app/error.tsx` (a page fails) and `src/app/global-error.tsx` (the root layout fails) show the same digest as an
+  **error code**, so a report can be matched with its log line.
+- Tests: `e2e/a11y.spec.ts` checks every page with axe (WCAG 2.2 AA) and a keyboard-only journey.
+
 ## Rendering (Cache Components)
 
 The page frame (the **static shell**) is built once and sent at once. Anything that needs the request

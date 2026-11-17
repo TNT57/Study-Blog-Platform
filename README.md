@@ -12,6 +12,22 @@ security (XSS), testing, CI/CD and a design-first workflow.
 
 Each milestone is one pull request with a short learning note in [`docs/learn/`](docs/learn).
 
+## What it does
+
+- **Posts:** write, edit and delete posts. Only the author (or an admin) can change one.
+- **Accounts:** sign up, log in and log out, built by hand: Argon2id passwords and database sessions in an `httpOnly` cookie.
+- **Study timer:** a Pomodoro timer that saves every finished focus round, with stats for today, this week,
+  the last 7 days and your top topics, in your own time zone.
+- **Quality:** every page is checked for accessibility (axe, WCAG 2.2 AA) and with a keyboard only, at desktop and
+  phone sizes. Server errors are logged as JSON with an error code the user can report.
+
+## Screenshots
+
+| Posts                                                    | Study timer and stats                                                  |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| ![The post list, logged in](docs/screenshots/home.png)   | ![The Study page with the timer and stats](docs/screenshots/study.png) |
+| ![A post, seen by its author](docs/screenshots/post.png) | ![The Study page on a phone](docs/screenshots/study-phone.png)         |
+
 ## Tech stack
 
 | Area            | Tool                                                          |
@@ -22,7 +38,7 @@ Each milestone is one pull request with a short learning note in [`docs/learn/`]
 | Design          | Claude Design canvas (style guide + every screen)             |
 | Database        | PostgreSQL 17 (from M1): raw SQL with `pg`, Drizzle ORM in M8 |
 | Auth            | Built by hand: Argon2id + database sessions                   |
-| Tests           | Vitest + Testing Library, Playwright (from M2)                |
+| Tests           | Vitest + Testing Library, Playwright + axe (accessibility)    |
 | Code quality    | ESLint, Prettier, Husky + lint-staged, Conventional Commits   |
 | CI / CD         | GitHub Actions, Dependabot, Vercel + Neon (from M1)           |
 | Package manager | pnpm 11                                                       |
@@ -131,7 +147,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **M3** Authentication (register, login, logout, sessions)
 - [x] **M4** Authorization (only the owner or an admin can edit)
 - [x] **M5** Pomodoro timer + study stats
-- [ ] **M6** End-to-end tests + accessibility checks
+- [x] **M6** End-to-end tests + accessibility checks
 - [ ] **M7** XSS lesson (Markdown, sanitizing, Content Security Policy)
 - [ ] **M8** Refactor the Model layer to Drizzle ORM
 

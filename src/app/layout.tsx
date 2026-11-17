@@ -1,23 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 
 import { SiteHeader } from "@/components/site-header";
 import { Toast } from "@/components/toast";
 
+import { fontVariables } from "./fonts";
 import "./globals.css";
-
-// Fonts from the style guide. next/font downloads them at build time,
-// so the browser never calls Google Fonts directly (faster + more private).
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -29,10 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${fontVariables} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {/* Keyboard users can jump over the menu, straight to the page. */}
         <a

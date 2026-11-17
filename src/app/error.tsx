@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { errorDigest } from "@/lib/error-report";
 
 export default function ErrorPage({
   error,
   retry,
 }: {
-  error: Error & { digest?: string };
+  /** What was thrown. From the server it's an Error with a `digest`; from the browser, anything. */
+  error: unknown;
   /** Loads the page again (fetches the data again). */
   retry: () => void;
 }) {
@@ -33,6 +35,7 @@ export default function ErrorPage({
         It’s not you, it’s us. Try again in a moment. If it keeps happening,
         come back later.
       </p>
+      <ErrorCode digest={errorDigest(error)} />
       <div className="mt-1.5 flex flex-wrap justify-center gap-2">
         <Button onClick={() => retry()}>Try again</Button>
         <Link href="/" className={buttonVariants({ variant: "outline" })}>
@@ -40,5 +43,18 @@ export default function ErrorPage({
         </Link>
       </div>
     </main>
+  );
+}
+
+/**
+ * The short code of a server error. The same code is in the server logs (src/instrumentation.ts),
+ * so if someone reports it, we can find exactly what happened, without showing them any details.
+ */
+export function ErrorCode({ digest }: { digest: string | undefined }) {
+  if (!digest) return null;
+  return (
+    <p className="text-caption text-muted-foreground">
+      Error code: <code className="font-mono">{digest}</code>
+    </p>
   );
 }

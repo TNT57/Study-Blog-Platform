@@ -92,6 +92,17 @@ tests prove nothing else broke.
   **error code**, so a report can be matched with its log line.
 - Tests: `e2e/a11y.spec.ts` checks every page with axe (WCAG 2.2 AA) and a keyboard-only journey.
 
+## Showing user content safely (M7)
+
+- Post content is **Markdown**, written by users, so it's untrusted. `src/components/post-markdown.tsx` builds React
+  elements with react-markdown (raw HTML removed, `javascript:` links removed), then rehype-sanitize keeps only a safe
+  list. Never `dangerouslySetInnerHTML` with user content.
+- The text is stored exactly as written, and made safe **when shown**. Excerpts use `markdownToText()`
+  (`src/lib/markdown-text.ts`, server-only because the parser is large).
+- `next.config.ts` sends security headers with every page, including a **Content Security Policy**. It allows inline
+  scripts, because Next.js streams `<Suspense>` parts with them (nonces would make every page dynamic). So safe
+  rendering is the main lock against XSS, and the CSP is the second one.
+
 ## Rendering (Cache Components)
 
 The page frame (the **static shell**) is built once and sent at once. Anything that needs the request

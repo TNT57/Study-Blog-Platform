@@ -5,12 +5,13 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { DeletePostButton } from "@/components/delete-post-button";
+import { PostMarkdown } from "@/components/post-markdown";
 import { PostDetailSkeleton } from "@/components/skeletons";
 import { buttonVariants } from "@/components/ui/button";
 import { deletePost } from "@/controllers/post.actions";
 import { getPost } from "@/controllers/post.queries";
 import { getCurrentUser } from "@/controllers/session";
-import { formatPostDate, initialOf, toParagraphs } from "@/lib/format";
+import { formatPostDate, initialOf } from "@/lib/format";
 import { canEditPost } from "@/lib/policies";
 import { parseId } from "@/lib/search-params";
 
@@ -96,14 +97,8 @@ async function PostArticle({
         </div>
       </header>
 
-      {/* Plain text: React escapes it, so "<script>" in a post is shown, never run (more in M7). */}
-      <div className="flex flex-col gap-5 text-reading [overflow-wrap:anywhere]">
-        {toParagraphs(post.content).map((paragraph, index) => (
-          <p key={index} className="whitespace-pre-line">
-            {paragraph}
-          </p>
-        ))}
-      </div>
+      {/* Markdown from a user: rendered as React elements, then sanitized. Never an HTML string. */}
+      <PostMarkdown content={post.content} />
     </article>
   );
 }

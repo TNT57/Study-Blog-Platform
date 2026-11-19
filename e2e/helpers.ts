@@ -35,12 +35,14 @@ export async function logOut(page: Page) {
 }
 
 /** Writes a post through the real editor. Returns its title and its address, like "/posts/12". */
-export async function writePost(page: Page, title = `A post ${Date.now()}`) {
+export async function writePost(
+  page: Page,
+  title = `A post ${Date.now()}`,
+  content = "Written by a Playwright test, to check who may change it.",
+) {
   await page.goto("/posts/new");
   await page.getByRole("textbox", { name: "Title" }).fill(title);
-  await page
-    .getByRole("textbox", { name: "Content" })
-    .fill("Written by a Playwright test, to check who may change it.");
+  await page.getByRole("textbox", { name: "Content" }).fill(content);
   await page.getByRole("button", { name: "Publish post" }).click();
   await expect(
     page.getByRole("heading", { level: 1, name: title }),

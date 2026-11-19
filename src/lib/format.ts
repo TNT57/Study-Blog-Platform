@@ -44,14 +44,6 @@ export function initialOf(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-/** Splits plain text into paragraphs at empty lines. Single line breaks stay inside a paragraph. */
-export function toParagraphs(content: string): string[] {
-  return content
-    .split(/\n\s*\n/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
-}
-
 /** Focus time for the stats: 0 → "0 min", 50 → "50 min", 250 → "4 h 10 m", 120 → "2 h". */
 export function formatMinutes(minutes: number): string {
   if (minutes < 60) return `${minutes} min`;

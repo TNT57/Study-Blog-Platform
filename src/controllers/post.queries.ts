@@ -6,6 +6,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 
 import { makeExcerpt, wasEdited } from "@/lib/format";
+import { markdownToText } from "@/lib/markdown-text";
 import { findPostById, listPosts } from "@/models/post.model";
 import { findUserById } from "@/models/user.model";
 
@@ -58,7 +59,7 @@ export async function getPostPage(before?: number): Promise<PostPage> {
     posts: page.map((post) => ({
       id: post.id,
       title: post.title,
-      excerpt: makeExcerpt(post.content),
+      excerpt: makeExcerpt(markdownToText(post.content)),
       authorUsername: post.authorUsername,
       createdAt: post.createdAt,
     })),

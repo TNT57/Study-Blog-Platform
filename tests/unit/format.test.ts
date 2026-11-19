@@ -5,7 +5,6 @@ import {
   formatPostDate,
   initialOf,
   makeExcerpt,
-  toParagraphs,
   wasEdited,
   weekdayOf,
 } from "@/lib/format";
@@ -44,13 +43,6 @@ describe("dates", () => {
 describe("small text helpers", () => {
   it("makes the avatar letter", () => {
     expect(initialOf("trung")).toBe("T");
-  });
-
-  it("splits text into paragraphs at empty lines", () => {
-    expect(toParagraphs("One\nstill one\n\n\nTwo\n \n")).toEqual([
-      "One\nstill one",
-      "Two",
-    ]);
   });
 });
 

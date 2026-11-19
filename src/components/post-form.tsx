@@ -189,7 +189,8 @@ function PostFormFields({
             id={ids.contentHint}
             className="text-caption text-muted-foreground"
           >
-            Plain text. Line breaks are kept.
+            Markdown works: **bold**, _italic_, `code`, lists and
+            [links](https://example.com). An empty line starts a new paragraph.
           </span>
         </div>
 

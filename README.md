@@ -14,7 +14,8 @@ Each milestone is one pull request with a short learning note in [`docs/learn/`]
 
 ## What it does
 
-- **Posts:** write, edit and delete posts. Only the author (or an admin) can change one.
+- **Posts:** write, edit and delete posts in Markdown, rendered safely (no XSS). Only the author (or an admin) can
+  change one.
 - **Accounts:** sign up, log in and log out, built by hand: Argon2id passwords and database sessions in an `httpOnly` cookie.
 - **Study timer:** a Pomodoro timer that saves every finished focus round, with stats for today, this week,
   the last 7 days and your top topics, in your own time zone.
@@ -148,7 +149,7 @@ See [`docs/architecture.md`](docs/architecture.md).
 - [x] **M4** Authorization (only the owner or an admin can edit)
 - [x] **M5** Pomodoro timer + study stats
 - [x] **M6** End-to-end tests + accessibility checks
-- [ ] **M7** XSS lesson (Markdown, sanitizing, Content Security Policy)
+- [x] **M7** XSS lesson (Markdown, sanitizing, Content Security Policy)
 - [ ] **M8** Refactor the Model layer to Drizzle ORM
 
 ## How we work

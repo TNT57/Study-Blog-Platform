@@ -123,6 +123,8 @@ export function TimerSettingsDialog({
                   min={field.min}
                   max={field.max}
                   defaultValue={settings[field.name]}
+                  // When the dialog opens, the keyboard focus starts in the first field.
+                  autoFocus={field.name === "focus"}
                   aria-describedby={`${id}-${field.name}-hint`}
                   className={fieldClass}
                 />

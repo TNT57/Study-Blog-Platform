@@ -105,7 +105,7 @@ If the POST fails (offline), the round stays in "unsaved", and the page shows **
 ## Time zones: why `local_date`?
 
 Trung studies at **8 am on Friday in Adelaide**. In UTC (the server's clock), it is still **9:30 pm on Thursday**.
-If we used the server's date, his Friday morning round would land on Thursday's bar.
+If we used the server's date, Trung's Friday morning round would land on Thursday's bar.
 
 So the database works out the user's own day when it saves: `(now() AT TIME ZONE 'Australia/Adelaide')::date`.
 The browser never sends a date: its clock can be wrong, or faked.
